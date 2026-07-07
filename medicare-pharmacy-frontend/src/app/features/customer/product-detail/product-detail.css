@@ -1,0 +1,459 @@
+.product-detail-page {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.alert {
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.alert-error {
+  background: var(--color-error-container);
+  color: var(--color-error);
+}
+
+.alert-success {
+  background: var(--color-secondary-container);
+  color: var(--color-secondary);
+}
+
+.loading-box,
+.empty-state {
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-xl);
+  padding: 48px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.loading-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--color-on-surface-variant);
+}
+
+.loading-box .material-symbols-outlined {
+  animation: spin 1s linear infinite;
+}
+
+.empty-state .material-symbols-outlined {
+  font-size: 54px;
+  color: var(--color-outline);
+}
+
+.empty-state h2 {
+  margin: 12px 0 4px;
+}
+
+.empty-state p {
+  margin: 0 0 20px;
+  color: var(--color-on-surface-variant);
+}
+
+.empty-state .btn-primary {
+  display: inline-flex;
+  text-decoration: none;
+}
+
+.detail-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.product-image-section {
+  min-width: 0;
+}
+
+.product-image {
+  position: relative;
+  min-height: 520px;
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at top right, rgba(156, 242, 232, 0.35), transparent 35%),
+    var(--color-surface-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product-image img {
+  max-width: 82%;
+  max-height: 82%;
+  object-fit: contain;
+}
+
+.product-placeholder {
+  font-size: 150px;
+  color: var(--color-primary);
+  opacity: 0.8;
+}
+
+.prescription-badge {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-error-container);
+  color: var(--color-error);
+  padding: 8px 12px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.prescription-badge .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.product-info-section {
+  min-width: 0;
+}
+
+.category-name {
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+.product-info-section h1 {
+  margin: 0;
+  font-size: 40px;
+  line-height: 48px;
+  font-weight: 900;
+  color: var(--color-on-surface);
+}
+
+.price-row {
+  margin-top: 18px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.price-row strong {
+  color: var(--color-primary);
+  font-size: 34px;
+  line-height: 42px;
+  font-weight: 900;
+}
+
+.price-row span {
+  color: var(--color-on-surface-variant);
+  font-size: 16px;
+}
+
+.stock-row {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+}
+
+.stock-row .material-symbols-outlined {
+  font-size: 19px;
+}
+
+.stock-ok {
+  color: var(--color-secondary);
+}
+
+.stock-low {
+  color: var(--color-tertiary);
+}
+
+.stock-out {
+  color: var(--color-error);
+}
+
+.meta-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.meta-grid div {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+
+.meta-grid span {
+  display: block;
+  color: var(--color-on-surface-variant);
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.meta-grid strong {
+  display: block;
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.prescription-note {
+  margin-top: 20px;
+  background: var(--color-error-container);
+  color: var(--color-error);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  display: flex;
+  gap: 10px;
+}
+
+.prescription-note .material-symbols-outlined {
+  flex-shrink: 0;
+}
+
+.prescription-note strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.prescription-note p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.purchase-box {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 140px 1fr 1fr;
+  gap: 12px;
+}
+
+.quantity-control {
+  height: 48px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  background: white;
+}
+
+.quantity-control button {
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantity-control button:hover:not(:disabled) {
+  background: var(--color-surface-container);
+}
+
+.quantity-control button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.quantity-control span {
+  text-align: center;
+  font-weight: 900;
+}
+
+.add-cart-button,
+.buy-now-button,
+.upload-prescription-button {
+  height: 48px;
+  border-radius: var(--radius-lg);
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 14px;
+}
+
+.add-cart-button {
+  border: none;
+  background: var(--color-primary);
+  color: white;
+}
+
+.add-cart-button:hover:not(:disabled) {
+  background: var(--color-primary-container);
+}
+
+.buy-now-button {
+  border: 1px solid var(--color-primary);
+  background: white;
+  color: var(--color-primary);
+}
+
+.buy-now-button:hover:not(:disabled) {
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.add-cart-button:disabled,
+.buy-now-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.upload-prescription-button {
+  width: 100%;
+  margin-top: 12px;
+  border: none;
+  background: var(--color-error-container);
+  color: var(--color-error);
+}
+
+.detail-tabs-card,
+.safety-card {
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-primary);
+  font-size: 20px;
+  font-weight: 900;
+  margin-bottom: 20px;
+}
+
+.info-sections {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.info-block {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+}
+
+.info-block h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.info-block p {
+  margin: 0;
+  color: var(--color-on-surface-variant);
+  line-height: 24px;
+  white-space: pre-line;
+}
+
+.safety-card {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.safety-item {
+  display: flex;
+  gap: 12px;
+}
+
+.safety-item > .material-symbols-outlined {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.safety-item strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.safety-item p {
+  margin: 0;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1100px) {
+  .detail-card {
+    grid-template-columns: 1fr;
+  }
+
+  .product-image {
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 760px) {
+  .product-detail-page {
+    padding: 20px 16px;
+  }
+
+  .product-info-section h1 {
+    font-size: 30px;
+    line-height: 38px;
+  }
+
+  .price-row strong {
+    font-size: 28px;
+  }
+
+  .meta-grid,
+  .info-sections,
+  .safety-card {
+    grid-template-columns: 1fr;
+  }
+
+  .purchase-box {
+    grid-template-columns: 1fr;
+  }
+}

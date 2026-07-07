@@ -1,0 +1,154 @@
+<div class="register-page">
+  <section class="register-card">
+    <div class="brand-header">
+      <div class="brand-icon">
+        <span class="material-symbols-outlined">local_pharmacy</span>
+      </div>
+
+      <div>
+        <h1>Tạo tài khoản Customer</h1>
+        <p>Đăng ký để mua thuốc, theo dõi đơn hàng và upload đơn thuốc online.</p>
+      </div>
+    </div>
+
+    @if (errorMessage) {
+      <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        {{ errorMessage }}
+      </div>
+    }
+
+    @if (successMessage) {
+      <div class="alert alert-success">
+        <span class="material-symbols-outlined">check_circle</span>
+        {{ successMessage }}
+      </div>
+    }
+
+    <form class="register-form" (ngSubmit)="register()">
+      <div class="form-group">
+        <label>Họ và tên</label>
+
+        <div class="input-wrapper">
+          <span class="material-symbols-outlined">person</span>
+          <input
+            type="text"
+            name="fullName"
+            [(ngModel)]="form.fullName"
+            placeholder="Nhập tên người dùng"
+            autocomplete="name"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+
+        <div class="input-wrapper">
+          <span class="material-symbols-outlined">mail</span>
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="form.email"
+            placeholder="Nhập email đăng ký"
+            autocomplete="email"
+          />
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Số điện thoại</label>
+
+          <div class="input-wrapper">
+            <span class="material-symbols-outlined">call</span>
+            <input
+              type="tel"
+              name="phoneNumber"
+              [(ngModel)]="form.phoneNumber"
+              placeholder="Nhập số điện thoại"
+              autocomplete="tel"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Địa chỉ</label>
+
+          <div class="input-wrapper">
+            <span class="material-symbols-outlined">location_on</span>
+            <input
+              type="text"
+              name="address"
+              [(ngModel)]="form.address"
+              placeholder="Địa chỉ giao hàng"
+              autocomplete="street-address"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Mật khẩu</label>
+
+          <div class="input-wrapper">
+            <span class="material-symbols-outlined">lock</span>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              name="password"
+              [(ngModel)]="form.password"
+              placeholder="Tối thiểu 6 ký tự"
+              autocomplete="new-password"
+            />
+
+            <button type="button" class="password-toggle" (click)="togglePassword()">
+              <span class="material-symbols-outlined">
+                {{ showPassword ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Xác nhận mật khẩu</label>
+
+          <div class="input-wrapper">
+            <span class="material-symbols-outlined">lock_reset</span>
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              name="confirmPassword"
+              [(ngModel)]="form.confirmPassword"
+              placeholder="Nhập lại mật khẩu"
+              autocomplete="new-password"
+            />
+
+            <button type="button" class="password-toggle" (click)="toggleConfirmPassword()">
+              <span class="material-symbols-outlined">
+                {{ showConfirmPassword ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="customer-note">
+        <span class="material-symbols-outlined">info</span>
+        <p>
+          Trang đăng ký chỉ tạo tài khoản <strong>Customer</strong>.
+          Tài khoản <strong>Admin</strong> chỉ được tạo bởi Admin trong khu vực quản trị.
+        </p>
+      </div>
+
+      <button type="submit" class="register-button" [disabled]="loading">
+        {{ loading ? 'Đang đăng ký...' : 'Đăng ký tài khoản' }}
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </form>
+
+    <div class="auth-links">
+      <span>Đã có tài khoản?</span>
+      <a routerLink="/auth/login">Đăng nhập</a>
+    </div>
+  </section>
+</div>

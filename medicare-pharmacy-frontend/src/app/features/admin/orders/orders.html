@@ -1,0 +1,309 @@
+<div class="admin-orders-page">
+  <header class="page-header">
+    <div>
+      <h1>Quản lý đơn hàng</h1>
+      <p>Tra cứu, xem chi tiết và cập nhật trạng thái đơn hàng.</p>
+    </div>
+  </header>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  <section class="toolbar-card">
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        name="keyword"
+        [(ngModel)]="query.keyword"
+        placeholder="Tìm theo mã đơn, tên khách, số điện thoại..."
+        (keyup.enter)="search()"
+      />
+    </div>
+
+    <select
+      name="status"
+      [(ngModel)]="query.status"
+      (change)="filterStatus()"
+    >
+      @for (status of orderStatuses; track status) {
+        <option [value]="status">
+          {{ status ? getStatusLabel(status) : 'Tất cả trạng thái' }}
+        </option>
+      }
+    </select>
+
+    <button type="button" class="search-button" (click)="search()">
+      <span class="material-symbols-outlined">search</span>
+      Tìm kiếm
+    </button>
+  </section>
+
+  @if (loading) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải đơn hàng...
+    </div>
+  } @else {
+    <section class="table-card">
+      <div class="table-card-title">
+        <div>
+          <h2>Danh sách đơn hàng</h2>
+          <p>{{ totalItems }} đơn hàng</p>
+        </div>
+      </div>
+
+      @if (orders.length === 0) {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">receipt_long</span>
+          <h3>Chưa có đơn hàng</h3>
+          <p>Khi khách đặt hàng, đơn sẽ xuất hiện tại đây.</p>
+        </div>
+      } @else {
+        <div class="table-wrapper">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Số điện thoại</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Thanh toán</th>
+                <th>Ngày đặt</th>
+                <th class="text-right">Hành động</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (order of orders; track order.id) {
+                <tr>
+                  <td>
+                    <strong class="order-code">{{ order.orderCode }}</strong>
+                  </td>
+
+                  <td>
+                    <strong>{{ order.customerName }}</strong>
+                  </td>
+
+                  <td>
+                    {{ order.customerPhone || '-' }}
+                  </td>
+
+                  <td>
+                    <strong class="amount">
+                      {{ order.totalAmount | currency:'VND':'symbol':'1.0-0':'vi' }}
+                    </strong>
+                  </td>
+
+                  <td>
+                    <span class="status-badge {{ getStatusClass(order.status) }}">
+                      {{ getStatusLabel(order.status) }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span class="payment-badge {{ getPaymentStatusClass(order.paymentStatus) }}">
+                      {{ getPaymentStatusLabel(order.paymentStatus) }}
+                    </span>
+                  </td>
+
+                  <td>
+                    {{ order.createdAt | vietnamDate:'dd/MM/yyyy HH:mm' }}
+                  </td>
+
+                  <td class="actions-cell">
+                    <button type="button" class="view-button" (click)="viewDetail(order)">
+                      <span class="material-symbols-outlined">visibility</span>
+                      Xem
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <button
+              type="button"
+              [disabled]="query.page === 1"
+              (click)="goToPage(query.page - 1)"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+
+            @for (page of pages; track page) {
+              <button
+                type="button"
+                [class.active]="page === query.page"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+
+            <button
+              type="button"
+              [disabled]="query.page === totalPages"
+              (click)="goToPage(query.page + 1)"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        }
+      }
+    </section>
+  }
+
+  @if (selectedOrder) {
+    <div class="modal-backdrop" (click)="closeDetail()">
+      <div class="order-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>Chi tiết đơn hàng</h2>
+            <p>{{ selectedOrder.orderCode }}</p>
+          </div>
+
+          <button type="button" class="close-button" (click)="closeDetail()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="modal-status-row">
+          <span class="status-badge {{ getStatusClass(selectedOrder.status) }}">
+            {{ getStatusLabel(selectedOrder.status) }}
+          </span>
+
+          <span class="payment-badge {{ getPaymentStatusClass(selectedOrder.paymentStatus) }}">
+            {{ selectedOrder.paymentMethod }} - {{ getPaymentStatusLabel(selectedOrder.paymentStatus) }}
+          </span>
+        </div>
+
+        <section class="detail-section">
+          <h3>Thông tin khách hàng</h3>
+
+          <div class="detail-grid">
+            <div>
+              <span>Người nhận</span>
+              <strong>{{ selectedOrder.customerName }}</strong>
+            </div>
+
+            <div>
+              <span>Số điện thoại</span>
+              <strong>{{ selectedOrder.customerPhone || '-' }}</strong>
+            </div>
+
+            <div class="full">
+              <span>Địa chỉ giao hàng</span>
+              <strong>{{ selectedOrder.shippingAddress }}</strong>
+            </div>
+
+            @if (selectedOrder.note) {
+              <div class="full">
+                <span>Ghi chú</span>
+                <strong>{{ selectedOrder.note }}</strong>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>Sản phẩm trong đơn</h3>
+
+          <div class="detail-items">
+            @for (item of selectedOrder.items; track item.id) {
+              <div class="detail-item">
+                <div>
+                  <strong>{{ item.productName }}</strong>
+                  <span>
+                    {{ item.quantity }} x
+                    {{ item.unitPrice | currency:'VND':'symbol':'1.0-0':'vi' }}
+                  </span>
+                </div>
+
+                <strong class="detail-item-total">
+                  {{ item.totalPrice | currency:'VND':'symbol':'1.0-0':'vi' }}
+                </strong>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>Cập nhật trạng thái</h3>
+
+          <div class="status-update-box">
+            <select
+              name="selectedStatus"
+              [(ngModel)]="selectedStatus"
+              [disabled]="selectedOrder.status === 'Cancelled'"
+            >
+              @for (status of statusOptions; track status) {
+                <option [value]="status">
+                  {{ getStatusLabel(status) }}
+                </option>
+              }
+            </select>
+
+            <button
+              type="button"
+              class="update-status-button"
+              (click)="updateStatus()"
+              [disabled]="updating || selectedOrder.status === 'Cancelled'"
+            >
+              @if (updating) {
+                Đang cập nhật...
+              } @else {
+                Cập nhật
+              }
+            </button>
+          </div>
+
+          @if (selectedOrder.status === 'Cancelled') {
+            <p class="status-note danger">
+              Đơn đã bị hủy nên không thể cập nhật trạng thái.
+            </p>
+          }
+<!-- 
+          @if (selectedStatus === selectedOrder.status) {
+            <p class="status-note">
+              Trạng thái được chọn đang giống trạng thái hiện tại.
+            </p>
+          } -->
+
+          @if (selectedStatus === 'Completed' && selectedOrder.paymentMethod === 'COD') {
+            <p class="status-note success">
+              Khi chuyển đơn COD sang Hoàn thành, hệ thống sẽ tự cập nhật thanh toán là Đã thanh toán.
+            </p>
+          }
+
+          @if (selectedStatus === 'Cancelled') {
+            <p class="status-note danger">
+              Khi hủy đơn, hệ thống sẽ cộng lại tồn kho.
+            </p>
+          }
+        </section>
+
+        <div class="modal-total">
+          <span>Tổng tiền</span>
+          <strong>
+            {{ selectedOrder.totalAmount | currency:'VND':'symbol':'1.0-0':'vi' }}
+          </strong>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="modal-close-button" (click)="closeDetail()">
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

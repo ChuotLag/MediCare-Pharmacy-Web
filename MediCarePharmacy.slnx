@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="MediCarePharmacy.API/MediCarePharmacy.API.csproj" />
+  <Project Path="MediCarePharmacy.Application/MediCarePharmacy.Application.csproj" />
+  <Project Path="MediCarePharmacy.Domain/MediCarePharmacy.Domain.csproj" />
+  <Project Path="MediCarePharmacy.Infrastructure/MediCarePharmacy.Infrastructure.csproj" />
+</Solution>

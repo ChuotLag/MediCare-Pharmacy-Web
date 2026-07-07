@@ -1,0 +1,243 @@
+<div class="product-detail-page">
+  <a class="back-link" routerLink="/products">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Quay lại danh sách sản phẩm
+  </a>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  @if (loading) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải chi tiết sản phẩm...
+    </div>
+  } @else {
+    @if (!product) {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">search_off</span>
+        <h2>Không tìm thấy sản phẩm</h2>
+        <p>Sản phẩm có thể đã bị ẩn hoặc không tồn tại.</p>
+
+        <a class="btn-primary" routerLink="/products">
+          Xem sản phẩm khác
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+      </div>
+    } @else {
+      <section class="detail-card">
+        <div class="product-image-section">
+          <div class="product-image">
+            @if (product.imageUrl) {
+              <img [src]="product.imageUrl" [alt]="product.name" />
+            } @else {
+              <span class="material-symbols-outlined product-placeholder">
+                medication
+              </span>
+            }
+
+            @if (product.requiresPrescription) {
+              <div class="prescription-badge">
+                <span class="material-symbols-outlined">warning</span>
+                Cần đơn thuốc
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="product-info-section">
+          <div class="category-name">
+            {{ product.categoryName }}
+          </div>
+
+          <h1>{{ product.name }}</h1>
+
+          <div class="price-row">
+            <strong>
+              {{ product.price | currency:'VND':'symbol':'1.0-0':'vi' }}
+            </strong>
+            <span>/ {{ product.unit }}</span>
+          </div>
+
+          <div class="stock-row {{ getStockClass() }}">
+            @if (product.totalStock <= 0) {
+              <span class="material-symbols-outlined">cancel</span>
+            } @else if (product.totalStock <= 10) {
+              <span class="material-symbols-outlined">warning</span>
+            } @else {
+              <span class="material-symbols-outlined">check_circle</span>
+            }
+
+            {{ getStockText() }}
+          </div>
+
+          <div class="meta-grid">
+            <div>
+              <span>Nhà sản xuất</span>
+              <strong>{{ product.manufacturer || 'Đang cập nhật' }}</strong>
+            </div>
+
+            <div>
+              <span>Xuất xứ</span>
+              <strong>{{ product.origin || 'Đang cập nhật' }}</strong>
+            </div>
+
+            <div>
+              <span>Đơn vị</span>
+              <strong>{{ product.unit }}</strong>
+            </div>
+
+            <div>
+              <span>Loại thuốc</span>
+              <strong>
+                {{ product.requiresPrescription ? 'Thuốc kê đơn' : 'Không kê đơn' }}
+              </strong>
+            </div>
+          </div>
+
+          @if (product.requiresPrescription) {
+            <div class="prescription-note">
+              <span class="material-symbols-outlined">clinical_notes</span>
+
+              <div>
+                <strong>Sản phẩm này cần đơn thuốc</strong>
+                <p>
+                  Bạn cần upload đơn thuốc hợp lệ để dược sĩ duyệt trước khi xử lý đơn hàng.
+                </p>
+              </div>
+            </div>
+          }
+
+          <div class="purchase-box">
+            <div class="quantity-control">
+              <button
+                type="button"
+                (click)="decrease()"
+                [disabled]="adding || quantity <= 1 || product.totalStock <= 0"
+              >
+                <span class="material-symbols-outlined">remove</span>
+              </button>
+
+              <span>{{ quantity }}</span>
+
+              <button
+                type="button"
+                (click)="increase()"
+                [disabled]="adding || quantity >= product.totalStock || product.totalStock <= 0"
+              >
+                <span class="material-symbols-outlined">add</span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              class="add-cart-button"
+              (click)="addToCart()"
+              [disabled]="adding || product.totalStock <= 0"
+            >
+              <span class="material-symbols-outlined">add_shopping_cart</span>
+
+              @if (adding) {
+                Đang thêm...
+              } @else {
+                Thêm vào giỏ
+              }
+            </button>
+
+            <button
+              type="button"
+              class="buy-now-button"
+              (click)="buyNow()"
+              [disabled]="adding || product.totalStock <= 0"
+            >
+              Mua ngay
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+
+          @if (product.totalStock <= 0) {
+            <p class="stock-note danger">
+              Sản phẩm hiện đã hết hàng, vui lòng quay lại sau.
+            </p>
+          }
+
+          @if (product.requiresPrescription) {
+            <button
+              type="button"
+              class="upload-prescription-button"
+              (click)="goToUploadPrescription()"
+            >
+              <span class="material-symbols-outlined">upload_file</span>
+              Upload đơn thuốc
+            </button>
+          }
+        </div>
+      </section>
+
+      <section class="detail-tabs-card">
+        <div class="section-title">
+          <span class="material-symbols-outlined">info</span>
+          Thông tin sản phẩm
+        </div>
+
+        <div class="info-sections">
+          <article class="info-block">
+            <h2>Mô tả</h2>
+            <p>{{ product.description || 'Chưa có mô tả sản phẩm.' }}</p>
+          </article>
+
+          <article class="info-block">
+            <h2>Thành phần</h2>
+            <p>{{ product.ingredients || 'Chưa cập nhật thành phần.' }}</p>
+          </article>
+
+          <article class="info-block">
+            <h2>Hướng dẫn sử dụng</h2>
+            <p>
+              {{ product.usageInstructions || 'Vui lòng tham khảo hướng dẫn của dược sĩ hoặc bác sĩ.' }}
+            </p>
+          </article>
+
+          <article class="info-block">
+            <h2>Chống chỉ định</h2>
+            <p>{{ product.contraindications || 'Chưa cập nhật chống chỉ định.' }}</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="safety-card">
+        <div class="safety-item">
+          <span class="material-symbols-outlined">verified</span>
+
+          <div>
+            <strong>Thuốc chính hãng</strong>
+            <p>Sản phẩm có nguồn gốc rõ ràng, được quản lý theo lô tồn kho.</p>
+          </div>
+        </div>
+
+        <div class="safety-item">
+          <span class="material-symbols-outlined">support_agent</span>
+
+          <div>
+            <strong>Tư vấn dược sĩ</strong>
+            <p>Hỗ trợ kiểm tra đơn thuốc và tư vấn sử dụng an toàn.</p>
+          </div>
+        </div>
+
+        <div class="safety-item">
+          <span class="material-symbols-outlined">local_shipping</span>
+
+          <div>
+            <strong>Giao hàng tiện lợi</strong>
+            <p>Đặt hàng online, nhận thuốc tại nhà nhanh chóng.</p>
+          </div>
+        </div>
+      </section>
+    }
+  }
+</div>

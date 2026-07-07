@@ -1,0 +1,16 @@
+﻿namespace MediCarePharmacy.Application.Settings;
+
+public class EmailSettings
+{
+    public string SmtpHost { get; set; } = string.Empty;
+
+    public int SmtpPort { get; set; }
+
+    public bool EnableSsl { get; set; }
+
+    public string SenderName { get; set; } = string.Empty;
+
+    public string SenderEmail { get; set; } = string.Empty;
+
+    public string AppPassword { get; set; } = string.Empty;
+}

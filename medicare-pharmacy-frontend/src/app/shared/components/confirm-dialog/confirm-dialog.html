@@ -1,0 +1,38 @@
+@if (confirmService.state(); as dialog) {
+  <div class="confirm-backdrop" (click)="cancel()">
+    <section class="confirm-card" (click)="$event.stopPropagation()">
+      <div
+        class="confirm-icon"
+        [class.icon-danger]="dialog.variant === 'danger'"
+        [class.icon-warning]="dialog.variant === 'warning'"
+        [class.icon-success]="dialog.variant === 'success'"
+        [class.icon-primary]="dialog.variant === 'primary'"
+      >
+        <span class="material-symbols-outlined">
+          {{ dialog.icon }}
+        </span>
+      </div>
+
+      <h2>{{ dialog.title }}</h2>
+
+      <p>{{ dialog.message }}</p>
+
+      <div class="confirm-actions">
+        <button type="button" class="cancel-button" (click)="cancel()">
+          {{ dialog.cancelText }}
+        </button>
+
+        <button
+          type="button"
+          class="confirm-button"
+          [class.danger]="dialog.variant === 'danger'"
+          [class.warning]="dialog.variant === 'warning'"
+          [class.success]="dialog.variant === 'success'"
+          (click)="confirm()"
+        >
+          {{ dialog.confirmText }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

@@ -1,0 +1,216 @@
+<div class="cart-page">
+  <div class="cart-header">
+    <div>
+      <h1>Giỏ hàng</h1>
+      <p>Kiểm tra sản phẩm trước khi thanh toán</p>
+    </div>
+
+    <a class="continue-link" routerLink="/products">
+      <span class="material-symbols-outlined">arrow_back</span>
+      Tiếp tục mua hàng
+    </a>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  @if (loading) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải giỏ hàng...
+    </div>
+  } @else {
+    @if (!cart || cart.items.length === 0) {
+      <div class="empty-cart">
+        <div class="empty-icon">
+          <span class="material-symbols-outlined">shopping_cart</span>
+        </div>
+
+        <h2>Giỏ hàng của bạn đang trống</h2>
+        <p>Hãy thêm sản phẩm vào giỏ để bắt đầu đặt hàng.</p>
+
+        <a class="btn-primary" routerLink="/products">
+          Xem sản phẩm
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+      </div>
+    } @else {
+      <div class="cart-layout">
+        <section class="cart-items-card">
+          <div class="cart-card-title">
+            <div>
+              <h2>Sản phẩm trong giỏ</h2>
+              <p>{{ cart.totalItems }} sản phẩm</p>
+            </div>
+
+            <button
+              type="button"
+              class="clear-button"
+              (click)="clearCart()"
+              [disabled]="updating"
+            >
+              <span class="material-symbols-outlined">delete</span>
+              Xóa tất cả
+            </button>
+          </div>
+
+          @if (updating) {
+            <div class="updating-note">
+              <span class="material-symbols-outlined">sync</span>
+              Đang cập nhật giỏ hàng...
+            </div>
+          }
+
+          <div class="cart-items">
+            @for (item of cart.items; track item.id) {
+              <article
+                class="cart-item"
+                [class.out-of-stock]="item.availableStock <= 0"
+                [class.stock-invalid]="item.quantity > item.availableStock"
+              >
+                <div class="item-image">
+                  @if (item.productImageUrl) {
+                    <img [src]="item.productImageUrl" [alt]="item.productName" />
+                  } @else {
+                    <span class="material-symbols-outlined">medication</span>
+                  }
+                </div>
+
+                <div class="item-info">
+                  <div class="item-name-row">
+                    <h3>{{ item.productName }}</h3>
+
+                    @if (item.requiresPrescription) {
+                      <span class="prescription-badge">
+                        <span class="material-symbols-outlined">warning</span>
+                        Cần đơn thuốc
+                      </span>
+                    }
+                  </div>
+
+                  <p>
+                    Đơn giá:
+                    <strong>
+                      {{ item.unitPrice | currency:'VND':'symbol':'1.0-0':'vi' }}
+                    </strong>
+                  </p>
+
+                  <div
+                    class="stock-line"
+                    [class.stock-danger]="item.availableStock <= 0 || item.quantity > item.availableStock"
+                  >
+                    <span class="material-symbols-outlined">inventory_2</span>
+
+                    @if (item.availableStock <= 0) {
+                      Hết hàng
+                    } @else if (item.quantity > item.availableStock) {
+                      Không đủ tồn kho, chỉ còn {{ item.availableStock }} sản phẩm
+                    } @else {
+                      Còn {{ item.availableStock }} sản phẩm
+                    }
+                  </div>
+                </div>
+
+                <div class="quantity-box">
+                  <button
+                    type="button"
+                    (click)="decrease(item)"
+                    [disabled]="updating || item.quantity <= 1"
+                  >
+                    <span class="material-symbols-outlined">remove</span>
+                  </button>
+
+                  <span>{{ item.quantity }}</span>
+
+                  <button
+                    type="button"
+                    (click)="increase(item)"
+                    [disabled]="updating || item.quantity >= item.availableStock"
+                  >
+                    <span class="material-symbols-outlined">add</span>
+                  </button>
+                </div>
+
+                <div class="item-total">
+                  <strong>
+                    {{ item.totalPrice | currency:'VND':'symbol':'1.0-0':'vi' }}
+                  </strong>
+
+                  <button
+                    type="button"
+                    class="remove-button"
+                    (click)="removeItem(item)"
+                    [disabled]="updating"
+                    title="Xóa sản phẩm"
+                  >
+                    <span class="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+
+        <aside class="summary-card">
+          <h2>Tóm tắt đơn hàng</h2>
+
+          <div class="summary-row">
+            <span>Tổng sản phẩm</span>
+            <strong>{{ cart.totalItems }}</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Tạm tính</span>
+            <strong>
+              {{ cart.totalAmount | currency:'VND':'symbol':'1.0-0':'vi' }}
+            </strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Phí vận chuyển</span>
+            <strong>Liên hệ</strong>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-total">
+            <span>Tổng tiền</span>
+            <strong>
+              {{ cart.totalAmount | currency:'VND':'symbol':'1.0-0':'vi' }}
+            </strong>
+          </div>
+
+          @if (cart.hasPrescriptionRequiredItems) {
+            <div class="prescription-warning">
+              <span class="material-symbols-outlined">warning</span>
+              <div>
+                <strong>Giỏ hàng có thuốc cần đơn</strong>
+                <p>Bạn có thể upload đơn thuốc sau khi đặt hàng hoặc trước khi xác nhận đơn.</p>
+              </div>
+            </div>
+          }
+
+          <button
+            type="button"
+            class="checkout-button"
+            (click)="goToCheckout()"
+            [disabled]="updating || cart.items.length === 0"
+          >
+            Thanh toán
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+
+          <a class="upload-link" routerLink="/upload-prescription">
+            <span class="material-symbols-outlined">upload_file</span>
+            Upload đơn thuốc
+          </a>
+        </aside>
+      </div>
+    }
+  }
+</div>

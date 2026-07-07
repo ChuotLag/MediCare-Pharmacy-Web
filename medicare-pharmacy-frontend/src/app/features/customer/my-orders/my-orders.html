@@ -1,0 +1,275 @@
+<div class="orders-page">
+  <div class="orders-header">
+    <div>
+      <h1>Đơn hàng của tôi</h1>
+      <p>Theo dõi trạng thái đơn hàng và lịch sử mua thuốc</p>
+    </div>
+
+    <a class="continue-link" routerLink="/products">
+      <span class="material-symbols-outlined">add_shopping_cart</span>
+      Mua thêm sản phẩm
+    </a>
+  </div>
+
+  <section class="filter-card">
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        name="keyword"
+        [(ngModel)]="query.keyword"
+        placeholder="Tìm theo mã đơn, tên người nhận, số điện thoại..."
+        (keyup.enter)="search()"
+      />
+    </div>
+
+    <select
+      name="status"
+      [(ngModel)]="query.status"
+      (change)="filterStatus()"
+    >
+      @for (status of orderStatuses; track status) {
+        <option [value]="status">
+          {{ status || 'Tất cả trạng thái' }}
+        </option>
+      }
+    </select>
+
+    <button type="button" (click)="search()">
+      Tìm kiếm
+    </button>
+  </section>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  @if (loading) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải đơn hàng...
+    </div>
+  } @else {
+    @if (orders.length === 0) {
+      <div class="empty-orders">
+        <div class="empty-icon">
+          <span class="material-symbols-outlined">receipt_long</span>
+        </div>
+
+        <h2>Chưa có đơn hàng nào</h2>
+        <p>Bạn chưa đặt đơn hàng nào. Hãy khám phá sản phẩm của MediCare Pharmacy.</p>
+
+        <a class="btn-primary" routerLink="/products">
+          Xem sản phẩm
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+      </div>
+    } @else {
+      <section class="orders-card">
+        <div class="orders-card-title">
+          <h2>Danh sách đơn hàng</h2>
+          <span>{{ totalItems }} đơn hàng</span>
+        </div>
+
+        <div class="orders-table-wrapper">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Ngày đặt</th>
+                <th>Người nhận</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Thanh toán</th>
+                <th class="text-right">Hành động</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (order of orders; track order.id) {
+                <tr>
+                  <td>
+                    <strong class="order-code">{{ order.orderCode }}</strong>
+                  </td>
+
+                  <td>
+                    {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                  </td>
+
+                  <td>
+                    <div class="customer-info">
+                      <strong>{{ order.customerName }}</strong>
+                      <span>{{ order.customerPhone }}</span>
+                    </div>
+                  </td>
+
+                  <td>
+                    <strong class="amount">
+                      {{ order.totalAmount | currency:'VND':'symbol':'1.0-0':'vi' }}
+                    </strong>
+                  </td>
+
+                  <td>
+                    <span class="status-badge" [class]="getStatusClass(order.status)">
+                      {{ order.status }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span class="payment-badge" [class]="getPaymentStatusClass(order.paymentStatus)">
+                      {{ order.paymentStatus }}
+                    </span>
+                  </td>
+
+                  <td class="actions-cell">
+                    <button type="button" class="view-button" (click)="viewDetail(order)">
+                      <span class="material-symbols-outlined">visibility</span>
+                      Xem
+                    </button>
+
+                    @if (order.status === 'Pending') {
+                      <button type="button" class="cancel-button" (click)="cancelOrder(order)">
+                        <span class="material-symbols-outlined">cancel</span>
+                        Hủy
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      @if (totalPages > 1) {
+        <div class="pagination">
+          <button
+            type="button"
+            [disabled]="query.page === 1"
+            (click)="goToPage(query.page - 1)"
+          >
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+
+          @for (page of pages; track page) {
+            <button
+              type="button"
+              [class.active]="page === query.page"
+              (click)="goToPage(page)"
+            >
+              {{ page }}
+            </button>
+          }
+
+          <button
+            type="button"
+            [disabled]="query.page === totalPages"
+            (click)="goToPage(query.page + 1)"
+          >
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      }
+    }
+  }
+
+  @if (selectedOrder) {
+    <div class="modal-backdrop" (click)="closeDetail()">
+      <div class="order-detail-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>Chi tiết đơn hàng</h2>
+            <p>{{ selectedOrder.orderCode }}</p>
+          </div>
+
+          <button type="button" class="close-button" (click)="closeDetail()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="detail-status-row">
+          <span class="status-badge" [class]="getStatusClass(selectedOrder.status)">
+            {{ selectedOrder.status }}
+          </span>
+
+          <span class="payment-badge" [class]="getPaymentStatusClass(selectedOrder.paymentStatus)">
+            {{ selectedOrder.paymentMethod }} - {{ selectedOrder.paymentStatus }}
+          </span>
+        </div>
+
+        <section class="detail-section">
+          <h3>Thông tin nhận hàng</h3>
+
+          <div class="detail-grid">
+            <div>
+              <span>Người nhận</span>
+              <strong>{{ selectedOrder.customerName }}</strong>
+            </div>
+
+            <div>
+              <span>Số điện thoại</span>
+              <strong>{{ selectedOrder.customerPhone }}</strong>
+            </div>
+
+            <div class="full">
+              <span>Địa chỉ</span>
+              <strong>{{ selectedOrder.shippingAddress }}</strong>
+            </div>
+
+            @if (selectedOrder.note) {
+              <div class="full">
+                <span>Ghi chú</span>
+                <strong>{{ selectedOrder.note }}</strong>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>Sản phẩm</h3>
+
+          <div class="detail-items">
+            @for (item of selectedOrder.items; track item.id) {
+              <div class="detail-item">
+                <div>
+                  <strong>{{ item.productName }}</strong>
+                  <span>
+                    {{ item.quantity }} x
+                    {{ item.unitPrice | currency:'VND':'symbol':'1.0-0':'vi' }}
+                  </span>
+                </div>
+
+                <strong class="detail-item-total">
+                  {{ item.totalPrice | currency:'VND':'symbol':'1.0-0':'vi' }}
+                </strong>
+              </div>
+            }
+          </div>
+        </section>
+
+        <div class="modal-total">
+          <span>Tổng tiền</span>
+          <strong>
+            {{ selectedOrder.totalAmount | currency:'VND':'symbol':'1.0-0':'vi' }}
+          </strong>
+        </div>
+
+        <div class="modal-actions">
+          @if (selectedOrder.status === 'Pending') {
+            <button type="button" class="modal-cancel-button" (click)="cancelOrder(selectedOrder)">
+              Hủy đơn hàng
+            </button>
+          }
+
+          <button type="button" class="modal-close-button" (click)="closeDetail()">
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

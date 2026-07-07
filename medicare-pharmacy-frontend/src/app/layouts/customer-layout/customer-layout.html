@@ -1,0 +1,39 @@
+<header class="customer-header">
+  <div class="header-inner">
+    <a class="brand" routerLink="/">
+      <span class="material-symbols-outlined brand-icon">local_pharmacy</span>
+      <span>MediCare Pharmacy</span>
+    </a>
+
+    <div class="header-search">
+      <span class="material-symbols-outlined">search</span>
+      <input type="text" placeholder="Tìm kiếm thuốc, bệnh lý..." />
+    </div>
+
+    <nav class="customer-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a routerLink="/products" routerLinkActive="active">Products</a>
+      <a routerLink="/cart" routerLinkActive="active">
+        Cart
+        <span class="material-symbols-outlined nav-cart-icon">shopping_cart</span>
+      </a>
+      <a routerLink="/my-orders" routerLinkActive="active">My Orders</a>
+      <a routerLink="/upload-prescription" routerLinkActive="active">Prescription</a>
+      <a routerLink="/profile" routerLinkActive="active">Tài khoản</a>
+    </nav>
+
+    <div class="header-actions">
+      @if (isLoggedIn()) {
+        <span class="user-name">{{ userName }}</span>
+        <button type="button" class="btn-logout" (click)="logout()">Logout</button>
+      } @else {
+        <a class="btn-login" routerLink="/auth/login">Login</a>
+        <a class="btn-signup" routerLink="/auth/register">Sign Up</a>
+      }
+    </div>
+  </div>
+</header>
+
+<main class="customer-main">
+  <router-outlet></router-outlet>
+</main>

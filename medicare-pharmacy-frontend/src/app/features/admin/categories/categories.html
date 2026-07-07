@@ -1,0 +1,208 @@
+<div class="categories-page">
+  <header class="page-header">
+    <div>
+      <h1>Quản lý danh mục</h1>
+      <p>Thêm, sửa, ẩn/hiện và quản lý các danh mục thuốc.</p>
+    </div>
+
+    <button type="button" class="add-button" (click)="openCreateForm()">
+      <span class="material-symbols-outlined">add</span>
+      Thêm danh mục
+    </button>
+  </header>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  <section class="toolbar-card">
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        name="keyword"
+        [(ngModel)]="keyword"
+        placeholder="Tìm theo tên, slug, mô tả..."
+        (input)="applyFilter()"
+      />
+    </div>
+
+    <button type="button" class="refresh-button" (click)="loadCategories()">
+      <span class="material-symbols-outlined">refresh</span>
+      Làm mới
+    </button>
+  </section>
+
+  @if (loading) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải danh mục...
+    </div>
+  } @else {
+    <section class="table-card">
+      <div class="table-card-title">
+        <div>
+          <h2>Danh sách danh mục</h2>
+          <p>{{ filteredCategories.length }} danh mục</p>
+        </div>
+      </div>
+
+      @if (filteredCategories.length === 0) {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">category</span>
+          <h3>Không có danh mục</h3>
+          <p>Hãy thêm danh mục đầu tiên cho nhà thuốc.</p>
+        </div>
+      } @else {
+        <div class="table-wrapper">
+          <table class="categories-table">
+            <thead>
+              <tr>
+                <th>Tên danh mục</th>
+                <th>Slug</th>
+                <th>Mô tả</th>
+                <th>Trạng thái</th>
+                <th class="text-right">Hành động</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (category of filteredCategories; track category.id) {
+                <tr>
+                  <td>
+                    <div class="category-name-cell">
+                      <div class="category-icon">
+                        @if (category.imageUrl) {
+                          <img [src]="category.imageUrl" [alt]="category.name" />
+                        } @else {
+                          <span class="material-symbols-outlined">category</span>
+                        }
+                      </div>
+
+                      <strong>{{ category.name }}</strong>
+                    </div>
+                  </td>
+
+                  <td>
+                    <code>{{ category.slug }}</code>
+                  </td>
+
+                  <td class="description-cell">
+                    {{ category.description || '-' }}
+                  </td>
+
+                  <td>
+                    @if (category.isActive) {
+                      <span class="status-badge status-active">Active</span>
+                    } @else {
+                      <span class="status-badge status-inactive">Inactive</span>
+                    }
+                  </td>
+
+                  <td class="actions-cell">
+                    <button type="button" class="edit-button" (click)="openEditForm(category)">
+                      <span class="material-symbols-outlined">edit</span>
+                      Sửa
+                    </button>
+
+                    <button type="button" class="toggle-button" (click)="toggleActive(category)">
+                      @if (category.isActive) {
+                        <span class="material-symbols-outlined">visibility_off</span>
+                        Ẩn
+                      } @else {
+                        <span class="material-symbols-outlined">visibility</span>
+                        Hiện
+                      }
+                    </button>
+
+                    <button type="button" class="delete-button" (click)="deleteCategory(category.id, category.name)">
+                      <span class="material-symbols-outlined">delete</span>
+                      Xóa
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+
+  @if (showForm) {
+    <div class="modal-backdrop" (click)="closeForm()">
+      <div class="form-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>{{ editingCategory ? 'Cập nhật danh mục' : 'Thêm danh mục' }}</h2>
+            <p>
+              {{ editingCategory ? 'Chỉnh sửa thông tin danh mục thuốc.' : 'Tạo danh mục mới cho sản phẩm.' }}
+            </p>
+          </div>
+
+          <button type="button" class="close-button" (click)="closeForm()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <form class="category-form" (ngSubmit)="save()">
+          <div class="form-group">
+            <label>Tên danh mục</label>
+            <input
+              type="text"
+              name="name"
+              [(ngModel)]="form.name"
+              placeholder="Ví dụ: Thuốc giảm đau"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Mô tả</label>
+            <textarea
+              name="description"
+              [(ngModel)]="form.description"
+              rows="4"
+              placeholder="Mô tả ngắn về danh mục"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Image URL</label>
+            <input
+              type="text"
+              name="imageUrl"
+              [(ngModel)]="form.imageUrl"
+              placeholder="Có thể để trống"
+            />
+          </div>
+
+          @if (editingCategory) {
+            <label class="switch-row">
+              <input
+                type="checkbox"
+                name="isActive"
+                [(ngModel)]="form.isActive"
+              />
+              <span>Đang hoạt động</span>
+            </label>
+          }
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-modal-button" (click)="closeForm()">
+              Hủy
+            </button>
+
+            <button type="submit" class="save-button" [disabled]="saving">
+              {{ saving ? 'Đang lưu...' : 'Lưu danh mục' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

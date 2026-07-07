@@ -1,0 +1,202 @@
+<div class="products-page">
+  <aside class="filter-sidebar">
+    <div class="filter-card">
+      <h2>Categories</h2>
+
+      <label class="filter-option">
+        <input
+          type="radio"
+          name="category"
+          [checked]="!query.categoryId"
+          (change)="filterByCategory('')"
+        />
+        <span>All Medications</span>
+      </label>
+
+      @for (category of categories; track category.id) {
+        <label class="filter-option">
+          <input
+            type="radio"
+            name="category"
+            [checked]="query.categoryId === category.id"
+            (change)="filterByCategory(category.id)"
+          />
+          <span>{{ category.name }}</span>
+        </label>
+      }
+
+      <hr />
+
+      <h2>Prescription</h2>
+
+      <label class="filter-option">
+        <input type="radio" name="prescription" checked />
+        <span>All</span>
+      </label>
+
+      <label class="filter-option">
+        <input type="radio" name="prescription" />
+        <span>Over-the-Counter</span>
+      </label>
+
+      <label class="filter-option">
+        <input type="radio" name="prescription" />
+        <span>Requires Prescription</span>
+      </label>
+    </div>
+  </aside>
+
+  <section class="products-content">
+    <div class="toolbar">
+      <div>
+        <h1>All Products</h1>
+        <p>Showing {{ products.length }} of {{ totalItems }} results</p>
+      </div>
+
+      <div class="toolbar-actions">
+        <div class="search-box">
+          <span class="material-symbols-outlined">search</span>
+          <input
+            type="text"
+            name="keyword"
+            [(ngModel)]="query.keyword"
+            placeholder="Search medications..."
+            (keyup.enter)="search()"
+          />
+        </div>
+
+        <button type="button" class="search-button" (click)="search()">
+          Search
+        </button>
+
+        <div class="sort-box">
+          <span>Sort by:</span>
+
+          <select
+            name="sortBy"
+            [(ngModel)]="query.sortBy"
+            (change)="changeSort()"
+          >
+            <option value="newest">Mới nhất</option>
+            <option value="price_asc">Giá tăng dần</option>
+            <option value="price_desc">Giá giảm dần</option>
+            <option value="name_asc">Tên A-Z</option>
+            <option value="name_desc">Tên Z-A</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    @if (errorMessage) {
+      <div class="alert alert-error">{{ errorMessage }}</div>
+    }
+
+    @if (successMessage) {
+      <div class="alert alert-success">{{ successMessage }}</div>
+    }
+
+    @if (loading) {
+      <div class="loading-box">
+        <span class="material-symbols-outlined">progress_activity</span>
+        Đang tải sản phẩm...
+      </div>
+    } @else {
+      @if (products.length === 0) {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">search_off</span>
+          <h3>Không tìm thấy sản phẩm</h3>
+          <p>Hãy thử đổi từ khóa hoặc danh mục khác.</p>
+        </div>
+      } @else {
+        <div class="product-list-grid">
+          @for (product of products; track product.id) {
+            <article class="product-card" [class.out-of-stock]="product.totalStock <= 0">
+              <div class="product-image">
+                @if (product.requiresPrescription) {
+                  <span class="prescription-badge">
+                    <span class="material-symbols-outlined">warning</span>
+                    Cần đơn thuốc
+                  </span>
+                }
+
+                @if (product.imageUrl) {
+                  <img [src]="product.imageUrl" [alt]="product.name" />
+                } @else {
+                  <span class="material-symbols-outlined product-placeholder">medication</span>
+                }
+              </div>
+
+              <div class="product-body">
+                <span class="product-category">{{ product.categoryName }}</span>
+
+                <h3>{{ product.name }}</h3>
+
+                <div class="product-price">
+                  <strong>{{ product.price | currency:'VND':'symbol':'1.0-0':'vi' }}</strong>
+                  <span>/ {{ product.unit }}</span>
+                </div>
+
+                <div class="stock-status" [class]="getStockClass(product)">
+                  @if (product.totalStock <= 0) {
+                    <span class="material-symbols-outlined">cancel</span>
+                  } @else {
+                    <span class="material-symbols-outlined">check_circle</span>
+                  }
+
+                  {{ getStockText(product) }}
+                </div>
+
+                <div class="product-actions">
+                  <a class="detail-button" [routerLink]="['/products', product.slug]">
+                    Xem chi tiết
+                  </a>
+
+                  @if (product.totalStock > 0) {
+                    <button type="button" class="add-button" (click)="addToCart(product)">
+                      <span class="material-symbols-outlined">shopping_cart</span>
+                      Thêm
+                    </button>
+                  } @else {
+                    <button type="button" class="disabled-button" disabled>
+                      Hết hàng
+                    </button>
+                  }
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <button
+              type="button"
+              [disabled]="query.page === 1"
+              (click)="goToPage(query.page - 1)"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+
+            @for (page of pages; track page) {
+              <button
+                type="button"
+                [class.active]="page === query.page"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+
+            <button
+              type="button"
+              [disabled]="query.page === totalPages"
+              (click)="goToPage(query.page + 1)"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        }
+      }
+    }
+  </section>
+</div>

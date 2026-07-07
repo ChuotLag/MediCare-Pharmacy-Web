@@ -1,0 +1,138 @@
+.not-found-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background:
+    radial-gradient(circle at top center, rgba(156, 242, 232, 0.35), transparent 34%),
+    var(--color-background);
+}
+
+.not-found-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 32px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.08),
+    0 8px 24px rgba(0, 92, 85, 0.08);
+  padding: 42px 36px;
+  text-align: center;
+}
+
+.icon-wrap {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 18px;
+  border-radius: var(--radius-full);
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-wrap .material-symbols-outlined {
+  font-size: 42px;
+}
+
+.not-found-card h1 {
+  margin: 0;
+  font-size: 80px;
+  line-height: 88px;
+  font-weight: 900;
+  color: var(--color-primary);
+}
+
+.not-found-card h2 {
+  margin: 8px 0 0;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--color-on-surface);
+}
+
+.not-found-card p {
+  margin: 14px auto 26px;
+  max-width: 430px;
+  color: var(--color-on-surface-variant);
+  font-size: 15px;
+  line-height: 24px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primary-button,
+.secondary-button {
+  min-height: 46px;
+  border-radius: var(--radius-lg);
+  padding: 0 16px;
+  font-weight: 900;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.primary-button {
+  background: var(--color-primary);
+  color: white;
+}
+
+.secondary-button {
+  border: 1px solid var(--color-primary);
+  background: white;
+  color: var(--color-primary);
+}
+
+.small-links {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.small-links a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.small-links a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .not-found-card {
+    padding: 34px 22px;
+    border-radius: 24px;
+  }
+
+  .not-found-card h1 {
+    font-size: 64px;
+    line-height: 70px;
+  }
+
+  .not-found-card h2 {
+    font-size: 24px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+  }
+}

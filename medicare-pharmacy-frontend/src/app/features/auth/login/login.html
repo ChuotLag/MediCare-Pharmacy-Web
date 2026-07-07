@@ -1,0 +1,93 @@
+<div class="login-card">
+  <div class="login-header">
+    <div class="login-icon">
+      <span class="material-symbols-outlined">local_pharmacy</span>
+    </div>
+
+    <h1>Đăng nhập</h1>
+    <p>MediCare Pharmacy Portal</p>
+  </div>
+
+  <form class="login-form" (ngSubmit)="submit()">
+    <div class="form-group">
+      <label>Email</label>
+
+      <div class="input-icon">
+        <span class="material-symbols-outlined">mail</span>
+        <input
+          type="email"
+          name="email"
+          [(ngModel)]="form.email"
+          required
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="label-row">
+        <label>Password</label>
+        <a class="forgot-link" routerLink="/auth/forgot-password">Quên mật khẩu?</a>
+      </div>
+
+      <div class="input-icon">
+        <span class="material-symbols-outlined">lock</span>
+        <input
+          type="password"
+          name="password"
+          [(ngModel)]="form.password"
+          required
+        />
+      </div>
+    </div>
+
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
+
+    @if (successMessage) {
+      <div class="alert alert-success">
+        <span class="material-symbols-outlined">check_circle</span>
+        {{ successMessage }}
+      </div>
+    }
+
+    <button class="login-button" type="submit" [disabled]="loading">
+      {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+      <span class="material-symbols-outlined">arrow_forward</span>
+    </button>
+  </form>
+
+  <div class="divider">
+    <span></span>
+    <p>OR</p>
+    <span></span>
+  </div>
+
+  <p class="register-text">
+    Người mới?
+    <a routerLink="/auth/register">Tạo tài khoản</a>
+  </p>
+
+  <div class="demo-box">
+    <div class="demo-title">
+      <span class="material-symbols-outlined">info</span>
+      Demo Credentials
+    </div>
+
+    <div class="demo-row">
+      <strong>Admin Access</strong>
+      <div>
+        <span>admin@medicare.com</span>
+        <small>Admin&#64;123</small>
+      </div>
+    </div>
+
+    <div class="demo-row">
+      <strong>Customer Access</strong>
+      <div>
+        <span>customer@medicare.com</span>
+        <small>Customer&#64;123</small>
+      </div>
+    </div>
+  </div>
+</div>

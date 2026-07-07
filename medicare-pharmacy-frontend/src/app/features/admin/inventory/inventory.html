@@ -1,0 +1,335 @@
+<div class="inventory-page">
+  <header class="page-header">
+    <div>
+      <h1>Quản lý tồn kho</h1>
+      <p>Quản lý lô hàng, số lượng, giá nhập, giá bán và hạn sử dụng.</p>
+    </div>
+
+    <button type="button" class="add-button" (click)="openCreateForm()">
+      <span class="material-symbols-outlined">add</span>
+      Thêm lô hàng
+    </button>
+  </header>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  <section class="alert-summary-grid">
+    <article class="summary-alert danger">
+      <div>
+        <span class="material-symbols-outlined">warning</span>
+        <strong>Thuốc sắp hết hàng</strong>
+      </div>
+
+      <p>{{ lowStockItems.length }}</p>
+    </article>
+
+    <article class="summary-alert warning">
+      <div>
+        <span class="material-symbols-outlined">event_busy</span>
+        <strong>Lô gần hết hạn</strong>
+      </div>
+
+      <p>{{ nearExpiryItems.length }}</p>
+    </article>
+  </section>
+
+  <section class="toolbar-card">
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        name="keyword"
+        [(ngModel)]="query.keyword"
+        placeholder="Tìm theo tên sản phẩm hoặc số lô..."
+        (keyup.enter)="search()"
+      />
+    </div>
+
+    <select
+      name="productId"
+      [(ngModel)]="query.productId"
+      (change)="filterProduct()"
+    >
+      <option value="">Tất cả sản phẩm</option>
+
+      @for (product of products; track product.id) {
+        <option [value]="product.id">
+          {{ product.name }}
+        </option>
+      }
+    </select>
+
+    <button type="button" class="search-button" (click)="search()">
+      <span class="material-symbols-outlined">search</span>
+      Tìm kiếm
+    </button>
+  </section>
+
+  @if (loading) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải tồn kho...
+    </div>
+  } @else {
+    <section class="table-card">
+      <div class="table-card-title">
+        <div>
+          <h2>Danh sách lô hàng</h2>
+          <p>{{ totalItems }} lô hàng</p>
+        </div>
+      </div>
+
+      @if (inventories.length === 0) {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">inventory_2</span>
+          <h3>Chưa có lô hàng</h3>
+          <p>Hãy thêm lô hàng đầu tiên để cập nhật tồn kho sản phẩm.</p>
+        </div>
+      } @else {
+        <div class="table-wrapper">
+          <table class="inventory-table">
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th>Số lô</th>
+                <th>Số lượng</th>
+                <th>Giá nhập</th>
+                <th>Giá bán</th>
+                <th>Ngày SX</th>
+                <th>Hạn dùng</th>
+                <th>Ngưỡng</th>
+                <th>Trạng thái</th>
+                <th class="text-right">Hành động</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (item of inventories; track item.id) {
+                <tr>
+                  <td>
+                    <strong class="product-name">{{ item.productName }}</strong>
+                  </td>
+
+                  <td>
+                    <code>{{ item.batchNumber }}</code>
+                  </td>
+
+                  <td>
+                    <strong class="quantity">{{ item.quantity }}</strong>
+                  </td>
+
+                  <td>
+                    {{ item.importPrice | currency:'VND':'symbol':'1.0-0':'vi' }}
+                  </td>
+
+                  <td>
+                    <strong class="selling-price">
+                      {{ item.sellingPrice | currency:'VND':'symbol':'1.0-0':'vi' }}
+                    </strong>
+                  </td>
+
+                  <td>
+                    {{ item.manufactureDate ? (item.manufactureDate | vietnamDate:'dd/MM/yyyy') : '-' }}
+                  </td>
+
+                  <td>
+                    <div class="expiry-cell">
+                      <strong>{{ item.expiryDate | vietnamDate:'dd/MM/yyyy' }}</strong>
+                      <span>{{ item.daysToExpiry }} ngày</span>
+                    </div>
+                  </td>
+
+                  <td>
+                    {{ item.lowStockThreshold }}
+                  </td>
+
+                  <td>
+                    <span class="inventory-status {{ getInventoryStatusClass(item) }}">
+                      {{ getInventoryStatusText(item) }}
+                    </span>
+                  </td>
+
+                  <td class="actions-cell">
+                    <button type="button" class="edit-button" (click)="openEditForm(item)">
+                      <span class="material-symbols-outlined">edit</span>
+                      Sửa
+                    </button>
+
+                    <button type="button" class="delete-button" (click)="deleteInventory(item)">
+                      <span class="material-symbols-outlined">delete</span>
+                      Xóa
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <button
+              type="button"
+              [disabled]="query.page === 1"
+              (click)="goToPage(query.page - 1)"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+
+            @for (page of pages; track page) {
+              <button
+                type="button"
+                [class.active]="page === query.page"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+
+            <button
+              type="button"
+              [disabled]="query.page === totalPages"
+              (click)="goToPage(query.page + 1)"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        }
+      }
+    </section>
+  }
+
+  @if (showForm) {
+    <div class="modal-backdrop" (click)="cancelEdit()">
+      <div class="form-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>{{ editingInventory ? 'Cập nhật lô hàng' : 'Thêm lô hàng' }}</h2>
+            <p>
+              {{ editingInventory ? 'Chỉnh sửa thông tin tồn kho.' : 'Tạo lô hàng mới cho sản phẩm.' }}
+            </p>
+          </div>
+
+          <button type="button" class="close-button" (click)="cancelEdit()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <form class="inventory-form" (ngSubmit)="save()">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Sản phẩm</label>
+              <select
+                name="productId"
+                [(ngModel)]="form.productId"
+                required
+              >
+                <option value="">Chọn sản phẩm</option>
+
+                @for (product of products; track product.id) {
+                  <option [value]="product.id">
+                    {{ product.name }}
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Số lô</label>
+              <input
+                type="text"
+                name="batchNumber"
+                [(ngModel)]="form.batchNumber"
+                placeholder="BATCH-2026-001"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Số lượng</label>
+              <input
+                type="number"
+                name="quantity"
+                [(ngModel)]="form.quantity"
+                min="0"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Giá nhập</label>
+              <input
+                type="number"
+                name="importPrice"
+                [(ngModel)]="form.importPrice"
+                min="0"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Giá bán</label>
+              <input
+                type="number"
+                name="sellingPrice"
+                [(ngModel)]="form.sellingPrice"
+                min="1"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Ngày sản xuất</label>
+              <input
+                type="date"
+                name="manufactureDate"
+                [(ngModel)]="form.manufactureDate"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Hạn sử dụng</label>
+              <input
+                type="date"
+                name="expiryDate"
+                [(ngModel)]="form.expiryDate"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Ngưỡng cảnh báo</label>
+              <input
+                type="number"
+                name="lowStockThreshold"
+                [(ngModel)]="form.lowStockThreshold"
+                min="0"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-modal-button" (click)="cancelEdit()">
+              Hủy
+            </button>
+
+            <button type="submit" class="save-button" [disabled]="saving">
+              @if (saving) {
+                Đang lưu...
+              } @else {
+                {{ editingInventory ? 'Cập nhật lô hàng' : 'Lưu lô hàng' }}
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

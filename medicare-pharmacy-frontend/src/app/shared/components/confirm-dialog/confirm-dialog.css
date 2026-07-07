@@ -1,0 +1,144 @@
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.18s ease;
+}
+
+.confirm-card {
+  width: 100%;
+  max-width: 430px;
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 28px;
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.22),
+    0 8px 24px rgba(0, 92, 85, 0.08);
+  padding: 28px;
+  text-align: center;
+  animation: popIn 0.2s ease;
+}
+
+.confirm-icon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 16px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-icon .material-symbols-outlined {
+  font-size: 36px;
+}
+
+.icon-primary {
+  background: rgba(15, 118, 110, 0.12);
+  color: var(--color-primary);
+}
+
+.icon-danger {
+  background: var(--color-error-container);
+  color: var(--color-error);
+}
+
+.icon-warning {
+  background: var(--color-tertiary-fixed);
+  color: var(--color-tertiary);
+}
+
+.icon-success {
+  background: var(--color-secondary-container);
+  color: var(--color-secondary);
+}
+
+.confirm-card h2 {
+  margin: 0;
+  color: var(--color-on-surface);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.confirm-card p {
+  margin: 10px 0 24px;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.cancel-button,
+.confirm-button {
+  height: 44px;
+  border-radius: var(--radius-lg);
+  font-weight: 900;
+}
+
+.cancel-button {
+  border: 1px solid var(--color-outline-variant);
+  background: white;
+  color: var(--color-on-surface-variant);
+}
+
+.confirm-button {
+  border: none;
+  background: var(--color-primary);
+  color: white;
+}
+
+.confirm-button.danger {
+  background: var(--color-error);
+}
+
+.confirm-button.warning {
+  background: var(--color-tertiary);
+}
+
+.confirm-button.success {
+  background: var(--color-secondary);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 520px) {
+  .confirm-card {
+    padding: 24px 20px;
+    border-radius: 22px;
+  }
+
+  .confirm-actions {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,180 @@
+<div class="checkout-page">
+  <div class="checkout-header">
+    <div>
+      <h1>Thanh toán</h1>
+      <p>Nhập thông tin nhận hàng và xác nhận đơn hàng</p>
+    </div>
+
+    <a class="back-link" routerLink="/cart">
+      <span class="material-symbols-outlined">arrow_back</span>
+      Quay lại giỏ hàng
+    </a>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (loading) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải thông tin đơn hàng...
+    </div>
+  } @else {
+    @if (cart) {
+      <div class="checkout-layout">
+        <section class="checkout-form-card">
+          <div class="card-title">
+            <span class="material-symbols-outlined">local_shipping</span>
+            <h2>Thông tin giao hàng</h2>
+          </div>
+
+          <form class="checkout-form" (ngSubmit)="submit()">
+            <div class="form-group">
+              <label>Họ tên người nhận</label>
+              <input
+                type="text"
+                name="customerName"
+                [(ngModel)]="form.customerName"
+                placeholder="Nguyen Van A"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Số điện thoại</label>
+              <input
+                type="text"
+                name="customerPhone"
+                [(ngModel)]="form.customerPhone"
+                placeholder="0900000002"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Địa chỉ giao hàng</label>
+              <textarea
+                name="shippingAddress"
+                [(ngModel)]="form.shippingAddress"
+                rows="4"
+                placeholder="Nhập địa chỉ nhận hàng"
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Phương thức thanh toán</label>
+
+              <div class="payment-option active">
+                <span class="material-symbols-outlined">payments</span>
+
+                <div>
+                  <strong>Thanh toán khi nhận hàng</strong>
+                  <p>COD - Trả tiền mặt khi nhận hàng</p>
+                </div>
+
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="COD"
+                  [(ngModel)]="form.paymentMethod"
+                  checked
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Ghi chú</label>
+              <textarea
+                name="note"
+                [(ngModel)]="form.note"
+                rows="3"
+                placeholder="Ví dụ: giao giờ hành chính, gọi trước khi giao..."
+              ></textarea>
+            </div>
+
+            @if (cart.hasPrescriptionRequiredItems) {
+              <div class="prescription-note">
+                <span class="material-symbols-outlined">warning</span>
+                <div>
+                  <strong>Đơn hàng có thuốc cần đơn</strong>
+                  <p>
+                    Bạn có thể upload đơn thuốc sau khi đặt hàng.
+                    Admin sẽ kiểm tra trước khi xác nhận đơn.
+                  </p>
+                </div>
+              </div>
+            }
+
+            <button class="submit-button" type="submit" [disabled]="submitting">
+              {{ submitting ? 'Đang đặt hàng...' : 'Đặt hàng' }}
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </form>
+        </section>
+
+        <aside class="order-summary-card">
+          <h2>Tóm tắt đơn hàng</h2>
+
+          <div class="summary-items">
+            @for (item of cart.items; track item.id) {
+              <div class="summary-item">
+                <div class="summary-item-left">
+                  <div class="summary-image">
+                    @if (item.productImageUrl) {
+                      <img [src]="item.productImageUrl" [alt]="item.productName" />
+                    } @else {
+                      <span class="material-symbols-outlined">medication</span>
+                    }
+                  </div>
+
+                  <div>
+                    <h3>{{ item.productName }}</h3>
+                    <p>Số lượng: {{ item.quantity }}</p>
+                  </div>
+                </div>
+
+                <strong>
+                  {{ item.totalPrice | currency:'VND':'symbol':'1.0-0':'vi' }}
+                </strong>
+              </div>
+            }
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-row">
+            <span>Tổng sản phẩm</span>
+            <strong>{{ cart.totalItems }}</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Tạm tính</span>
+            <strong>{{ cart.totalAmount | currency:'VND':'symbol':'1.0-0':'vi' }}</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Phí vận chuyển</span>
+            <strong>Liên hệ</strong>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-total">
+            <span>Tổng thanh toán</span>
+            <strong>{{ cart.totalAmount | currency:'VND':'symbol':'1.0-0':'vi' }}</strong>
+          </div>
+
+          <div class="safe-box">
+            <span class="material-symbols-outlined">verified_user</span>
+            <div>
+              <strong>Đặt hàng an toàn</strong>
+              <p>Thông tin của bạn được bảo mật và chỉ dùng để xử lý đơn hàng.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    }
+  }
+</div>

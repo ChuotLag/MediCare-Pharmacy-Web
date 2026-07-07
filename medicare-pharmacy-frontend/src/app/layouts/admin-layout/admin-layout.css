@@ -1,0 +1,132 @@
+.admin-layout {
+  min-height: 100vh;
+  display: flex;
+  background: var(--color-background);
+}
+
+.admin-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 248px;
+  background: var(--color-surface-container-lowest);
+  border-right: 1px solid var(--color-outline-variant);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 24px;
+  color: var(--color-primary);
+}
+
+.brand-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-icon .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1;
+}
+
+.admin-brand strong {
+  display: block;
+  font-size: 18px;
+  line-height: 20px;
+}
+
+.admin-brand span {
+  display: block;
+  color: var(--color-on-surface-variant);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.admin-nav a {
+  min-height: 42px;
+  border-radius: var(--radius-lg);
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-nav a:hover,
+.admin-nav a.active {
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--color-primary);
+}
+
+.admin-nav .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.logout-button {
+  min-height: 42px;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--color-error);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  font-weight: 800;
+}
+
+.logout-button:hover {
+  background: var(--color-error-container);
+}
+
+.admin-content {
+  margin-left: 248px;
+  min-height: 100vh;
+  flex: 1;
+  padding: 24px;
+}
+
+@media (max-width: 900px) {
+  .admin-sidebar {
+    position: static;
+    width: 100%;
+    min-height: auto;
+  }
+
+  .admin-layout {
+    flex-direction: column;
+  }
+
+  .admin-content {
+    margin-left: 0;
+  }
+
+  .admin-nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .admin-nav a {
+    white-space: nowrap;
+  }
+}

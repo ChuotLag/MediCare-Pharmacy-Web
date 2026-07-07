@@ -1,0 +1,359 @@
+<div class="admin-prescriptions-page">
+  <header class="page-header">
+    <div>
+      <h1>Quản lý đơn thuốc</h1>
+      <p>Xem, duyệt hoặc từ chối đơn thuốc khách hàng đã upload.</p>
+    </div>
+  </header>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  <section class="toolbar-card">
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        name="keyword"
+        [(ngModel)]="query.keyword"
+        placeholder="Tìm theo tên file, khách hàng, mã đơn..."
+        (keyup.enter)="search()"
+      />
+    </div>
+
+    <select
+      name="status"
+      [(ngModel)]="query.status"
+      (change)="filterStatus()"
+    >
+      @for (status of statuses; track status) {
+        <option [value]="status">
+          {{ status ? getStatusLabel(status) : 'Tất cả trạng thái' }}
+        </option>
+      }
+    </select>
+
+    <button type="button" class="search-button" (click)="search()">
+      <span class="material-symbols-outlined">search</span>
+      Tìm kiếm
+    </button>
+  </section>
+
+  @if (loading) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải đơn thuốc...
+    </div>
+  } @else {
+    <section class="table-card">
+      <div class="table-card-title">
+        <div>
+          <h2>Danh sách đơn thuốc</h2>
+          <p>{{ totalItems }} đơn thuốc</p>
+        </div>
+      </div>
+
+      @if (prescriptions.length === 0) {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">clinical_notes</span>
+          <h3>Chưa có đơn thuốc</h3>
+          <p>Khi khách upload đơn thuốc, dữ liệu sẽ xuất hiện tại đây.</p>
+        </div>
+      } @else {
+        <div class="table-wrapper">
+          <table class="prescriptions-table">
+            <thead>
+              <tr>
+                <th>Khách hàng</th>
+                <th>File</th>
+                <th>Mã đơn</th>
+                <th>Ngày upload</th>
+                <th>Trạng thái</th>
+                <th>Người duyệt</th>
+                <th class="text-right">Hành động</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (item of prescriptions; track item.id) {
+                <tr>
+                  <td>
+                    <div class="customer-cell">
+                      <div class="avatar">
+                        <span class="material-symbols-outlined">person</span>
+                      </div>
+
+                      <strong>{{ item.userFullName }}</strong>
+                    </div>
+                  </td>
+
+                  <td>
+                    <div class="file-cell">
+                      @if (isPdf(item.fileUrl)) {
+                        <span class="material-symbols-outlined pdf-icon">picture_as_pdf</span>
+                      } @else {
+                        <span class="material-symbols-outlined image-icon">image</span>
+                      }
+
+                      <div>
+                        <strong>{{ item.originalFileName }}</strong>
+                        <a [href]="getFileUrl(item.fileUrl)" target="_blank">
+                          Mở file
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td>
+                    {{ item.orderCode || 'Không gắn đơn' }}
+                  </td>
+
+                  <td>
+                    {{ item.createdAt | vietnamDate:'dd/MM/yyyy HH:mm' }}
+                  </td>
+
+                  <td>
+                    <span class="status-badge {{ getStatusClass(item.status) }}">
+                      {{ getStatusLabel(item.status) }}
+                    </span>
+                  </td>
+
+                  <td>
+                    {{ item.reviewerName || '-' }}
+                  </td>
+
+                  <td class="actions-cell">
+                    <button type="button" class="view-button" (click)="viewDetail(item)">
+                      <span class="material-symbols-outlined">visibility</span>
+                      Xem
+                    </button>
+
+                    @if (item.status === 'Pending') {
+                      <button type="button" class="approve-button" (click)="approve(item)">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        Duyệt
+                      </button>
+
+                      <button type="button" class="reject-button" (click)="reject(item)">
+                        <span class="material-symbols-outlined">cancel</span>
+                        Từ chối
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <button
+              type="button"
+              [disabled]="query.page === 1"
+              (click)="goToPage(query.page - 1)"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+
+            @for (page of pages; track page) {
+              <button
+                type="button"
+                [class.active]="page === query.page"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+
+            <button
+              type="button"
+              [disabled]="query.page === totalPages"
+              (click)="goToPage(query.page + 1)"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        }
+      }
+    </section>
+  }
+
+  @if (selectedPrescription) {
+    <div class="modal-backdrop" (click)="closeDetail()">
+      <div class="prescription-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>Chi tiết đơn thuốc</h2>
+            <p>{{ selectedPrescription.originalFileName }}</p>
+          </div>
+
+          <button type="button" class="close-button" (click)="closeDetail()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="modal-status-row">
+          <span class="status-badge {{ getStatusClass(selectedPrescription.status) }}">
+            {{ getStatusLabel(selectedPrescription.status) }}
+          </span>
+
+          @if (selectedPrescription.orderCode) {
+            <span class="order-pill">
+              {{ selectedPrescription.orderCode }}
+            </span>
+          }
+        </div>
+
+        <section class="preview-section">
+          @if (isImage(selectedPrescription.fileUrl)) {
+            <img
+              [src]="getFileUrl(selectedPrescription.fileUrl)"
+              [alt]="selectedPrescription.originalFileName"
+            />
+          } @else {
+            <div class="pdf-preview">
+              <span class="material-symbols-outlined">picture_as_pdf</span>
+              <p>File PDF</p>
+              <a [href]="getFileUrl(selectedPrescription.fileUrl)" target="_blank">
+                Mở PDF
+              </a>
+            </div>
+          }
+        </section>
+
+        <section class="info-section">
+          <h3>Thông tin đơn thuốc</h3>
+
+          <div class="info-grid">
+            <div>
+              <span>Khách hàng</span>
+              <strong>{{ selectedPrescription.userFullName }}</strong>
+            </div>
+
+            <div>
+              <span>Ngày upload</span>
+              <strong>
+                {{ selectedPrescription.createdAt | vietnamDate:'dd/MM/yyyy HH:mm' }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Mã đơn</span>
+              <strong>
+                {{ selectedPrescription.orderCode || 'Không gắn đơn' }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Người duyệt</span>
+              <strong>
+                {{ selectedPrescription.reviewerName || 'Chưa duyệt' }}
+              </strong>
+            </div>
+
+            @if (selectedPrescription.reviewedAt) {
+              <div>
+                <span>Ngày duyệt</span>
+                <strong>
+                  {{ selectedPrescription.reviewedAt | vietnamDate:'dd/MM/yyyy HH:mm' }}
+                </strong>
+              </div>
+            }
+
+            <div class="full">
+              <span>Ghi chú hiện tại</span>
+              <strong>
+                {{ selectedPrescription.adminNote || 'Chưa có ghi chú' }}
+              </strong>
+            </div>
+          </div>
+        </section>
+
+        @if (selectedPrescription.status === 'Pending') {
+          <section class="review-section">
+            <h3>Duyệt đơn thuốc</h3>
+
+            <div class="review-grid">
+              <div class="form-group">
+                <label>Trạng thái</label>
+                <select
+                  name="reviewStatus"
+                  [(ngModel)]="reviewForm.status"
+                >
+                  <option value="Approved">Đã duyệt</option>
+                  <option value="Rejected">Từ chối</option>
+                </select>
+              </div>
+
+              <div class="form-group full">
+                <label>
+                  Ghi chú Admin
+                  @if (reviewForm.status === 'Rejected') {
+                    <span class="required">*</span>
+                  }
+                </label>
+
+                <textarea
+                  name="adminNote"
+                  [(ngModel)]="reviewForm.adminNote"
+                  rows="4"
+                  placeholder="Ví dụ: Đơn thuốc hợp lệ hoặc lý do từ chối..."
+                ></textarea>
+              </div>
+            </div>
+
+            @if (reviewForm.status === 'Rejected') {
+              <p class="review-warning">
+                Khi từ chối, cần nhập lý do rõ ràng để khách hàng upload lại.
+              </p>
+            }
+
+            @if (reviewForm.status === 'Approved') {
+              <p class="review-note success">
+                Đơn thuốc sẽ được đánh dấu là đã duyệt.
+              </p>
+            }
+
+            <button
+              type="button"
+              class="submit-review-button"
+              (click)="submitReview()"
+              [disabled]="reviewing"
+            >
+              @if (reviewing) {
+                Đang xử lý...
+              } @else {
+                {{ reviewForm.status === 'Approved' ? 'Xác nhận duyệt' : 'Xác nhận từ chối' }}
+              }
+            </button>
+          </section>
+        } @else {
+          <section class="reviewed-note">
+            <span class="material-symbols-outlined">info</span>
+            Đơn thuốc này đã được xử lý, không thể duyệt lại.
+          </section>
+        }
+
+        <div class="modal-actions">
+          <a
+            class="modal-open-button"
+            [href]="getFileUrl(selectedPrescription.fileUrl)"
+            target="_blank"
+          >
+            Mở file gốc
+          </a>
+
+          <button type="button" class="modal-close-button" (click)="closeDetail()">
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

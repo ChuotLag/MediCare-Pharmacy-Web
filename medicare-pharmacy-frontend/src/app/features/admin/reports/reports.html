@@ -1,0 +1,258 @@
+<div class="reports-page">
+  <header class="page-header">
+    <div>
+      <h1>Báo cáo doanh thu</h1>
+      <p>Theo dõi doanh thu, đơn hàng hoàn thành và sản phẩm bán chạy.</p>
+    </div>
+  </header>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  <section class="filter-card">
+    <div class="form-group">
+      <label>Từ ngày</label>
+      <input
+        type="date"
+        name="fromDate"
+        [(ngModel)]="filter.fromDate"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Đến ngày</label>
+      <input
+        type="date"
+        name="toDate"
+        [(ngModel)]="filter.toDate"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Top sản phẩm</label>
+      <select
+        name="top"
+        [(ngModel)]="filter.top"
+      >
+        <option [value]="5">Top 5</option>
+        <option [value]="10">Top 10</option>
+        <option [value]="20">Top 20</option>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button type="button" class="apply-button" (click)="applyFilter()">
+        <span class="material-symbols-outlined">filter_alt</span>
+        Lọc báo cáo
+      </button>
+
+      <button type="button" class="reset-button" (click)="resetFilter()">
+        <span class="material-symbols-outlined">refresh</span>
+        Đặt lại
+      </button>
+    </div>
+  </section>
+
+  @if (loading && !summary) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải báo cáo...
+    </div>
+  } @else {
+    <section class="summary-grid">
+      <article class="summary-card">
+        <div class="summary-icon icon-revenue">
+          <span class="material-symbols-outlined">payments</span>
+        </div>
+
+        <div>
+          <p>Tổng doanh thu hệ thống</p>
+          <strong>
+            {{ summary?.totalRevenue ?? 0 | currency:'VND':'symbol':'1.0-0':'vi' }}
+          </strong>
+        </div>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-icon icon-orders">
+          <span class="material-symbols-outlined">receipt_long</span>
+        </div>
+
+        <div>
+          <p>Tổng đơn hàng</p>
+          <strong>{{ summary?.totalOrders ?? 0 }}</strong>
+        </div>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-icon icon-completed">
+          <span class="material-symbols-outlined">done_all</span>
+        </div>
+
+        <div>
+          <p>Đơn hoàn thành</p>
+          <strong>{{ summary?.completedOrders ?? 0 }}</strong>
+        </div>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-icon icon-cancelled">
+          <span class="material-symbols-outlined">cancel</span>
+        </div>
+
+        <div>
+          <p>Đơn đã hủy</p>
+          <strong>{{ summary?.cancelledOrders ?? 0 }}</strong>
+        </div>
+      </article>
+    </section>
+
+    <section class="range-grid">
+      <article class="range-card">
+        <p>Doanh thu trong khoảng lọc</p>
+        <strong>
+          {{ getTotalRevenueInRange() | currency:'VND':'symbol':'1.0-0':'vi' }}
+        </strong>
+      </article>
+
+      <article class="range-card">
+        <p>Đơn hoàn thành trong khoảng lọc</p>
+        <strong>{{ getTotalOrdersInRange() }}</strong>
+      </article>
+
+      <article class="range-card">
+        <p>Giá trị trung bình mỗi đơn</p>
+        <strong>
+          {{ getAverageOrderValue() | currency:'VND':'symbol':'1.0-0':'vi' }}
+        </strong>
+      </article>
+    </section>
+
+    <section class="reports-grid">
+      <article class="chart-card">
+        <div class="section-title-row">
+          <div>
+            <h2>Doanh thu theo ngày</h2>
+            <p>Chỉ tính đơn hàng có trạng thái Completed.</p>
+          </div>
+        </div>
+
+        @if (revenueData.length === 0) {
+          <div class="empty-chart">
+            <span class="material-symbols-outlined">bar_chart</span>
+            <h3>Chưa có dữ liệu doanh thu</h3>
+            <p>Hãy chuyển một số đơn hàng sang Completed để có báo cáo.</p>
+          </div>
+        } @else {
+          <div class="bar-chart">
+            @for (item of revenueData; track item.date) {
+              <div class="bar-item">
+                <div class="bar-tooltip">
+                  <strong>
+                    {{ item.totalRevenue | currency:'VND':'symbol':'1.0-0':'vi' }}
+                  </strong>
+                  <span>{{ item.totalOrders }} đơn</span>
+                </div>
+
+                <div class="bar-track">
+                  <div
+                    class="bar-fill"
+                    [style.height.%]="getRevenueHeight(item.totalRevenue)"
+                  ></div>
+                </div>
+
+                <span class="bar-label">{{ item.date | date:'dd/MM' }}</span>
+              </div>
+            }
+          </div>
+        }
+      </article>
+
+      <article class="top-products-card">
+        <div class="section-title-row">
+          <div>
+            <h2>Top sản phẩm bán chạy</h2>
+            <p>Xếp theo số lượng bán trong đơn Completed.</p>
+          </div>
+        </div>
+
+        @if (topProducts.length === 0) {
+          <div class="empty-list">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <p>Chưa có sản phẩm bán chạy.</p>
+          </div>
+        } @else {
+          <div class="top-product-list">
+            @for (product of topProducts; track product.productId; let index = $index) {
+              <div class="top-product-item">
+                <div class="rank">
+                  {{ index + 1 }}
+                </div>
+
+                <div class="top-product-info">
+                  <div class="top-product-header">
+                    <strong>{{ product.productName }}</strong>
+                    <span>{{ product.totalQuantitySold }} bán</span>
+                  </div>
+
+                  <div class="progress-track">
+                    <div
+                      class="progress-fill"
+                      [style.width.%]="getTopProductWidth(product.totalQuantitySold)"
+                    ></div>
+                  </div>
+
+                  <div class="top-product-revenue">
+                    {{ product.totalRevenue | currency:'VND':'symbol':'1.0-0':'vi' }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </article>
+    </section>
+
+    <section class="revenue-table-card">
+      <div class="section-title-row">
+        <div>
+          <h2>Bảng doanh thu theo ngày</h2>
+          <p>Chi tiết số đơn và doanh thu từng ngày.</p>
+        </div>
+      </div>
+
+      @if (revenueData.length === 0) {
+        <div class="empty-table">
+          Không có dữ liệu trong khoảng thời gian này.
+        </div>
+      } @else {
+        <div class="table-wrapper">
+          <table class="revenue-table">
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Số đơn hoàn thành</th>
+                <th>Doanh thu</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (item of revenueData; track item.date) {
+                <tr>
+                  <td>{{ item.date | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ item.totalOrders }}</td>
+                  <td>
+                    <strong class="amount">
+                      {{ item.totalRevenue | currency:'VND':'symbol':'1.0-0':'vi' }}
+                    </strong>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+</div>

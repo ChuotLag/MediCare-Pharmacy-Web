@@ -1,0 +1,65 @@
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <div class="brand-icon">
+        <span class="material-symbols-outlined">local_pharmacy</span>
+      </div>
+
+      <div>
+        <strong>MediCare</strong>
+        <span>Admin</span>
+      </div>
+    </div>
+
+    <nav class="admin-nav">
+      <a routerLink="/admin/dashboard" routerLinkActive="active">
+        <span class="material-symbols-outlined">dashboard</span>
+        Dashboard
+      </a>
+
+      <a routerLink="/admin/users" routerLinkActive="active">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        <span>Users</span>
+      </a>
+
+      <a routerLink="/admin/categories" routerLinkActive="active">
+        <span class="material-symbols-outlined">category</span>
+        Categories
+      </a>
+
+      <a routerLink="/admin/products" routerLinkActive="active">
+        <span class="material-symbols-outlined">medication</span>
+        Products
+      </a>
+
+      <a routerLink="/admin/inventory" routerLinkActive="active">
+        <span class="material-symbols-outlined">inventory_2</span>
+        Inventory
+      </a>
+
+      <a routerLink="/admin/orders" routerLinkActive="active">
+        <span class="material-symbols-outlined">receipt_long</span>
+        Orders
+      </a>
+
+      <a routerLink="/admin/prescriptions" routerLinkActive="active">
+        <span class="material-symbols-outlined">clinical_notes</span>
+        Prescriptions
+      </a>
+
+      <a routerLink="/admin/reports" routerLinkActive="active">
+        <span class="material-symbols-outlined">bar_chart</span>
+        Reports
+      </a>
+    </nav>
+
+    <button type="button" class="logout-button" (click)="logout()">
+      <span class="material-symbols-outlined">logout</span>
+      Logout
+    </button>
+  </aside>
+
+  <section class="admin-content">
+    <router-outlet></router-outlet>
+  </section>
+</div>

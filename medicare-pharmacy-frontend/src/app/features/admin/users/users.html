@@ -1,0 +1,367 @@
+<div class="admin-users-page">
+  <header class="page-header">
+    <div>
+      <h1>Quản lý tài khoản</h1>
+      <p>Tạo tài khoản, xem danh sách và khóa/mở khóa người dùng.</p>
+    </div>
+  </header>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">
+      <span class="material-symbols-outlined">error</span>
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">
+      <span class="material-symbols-outlined">check_circle</span>
+      {{ successMessage }}
+    </div>
+  }
+
+  <div class="content-grid">
+    <section class="form-card">
+      <div class="section-title">
+        <div class="section-icon">
+          <span class="material-symbols-outlined">person_add</span>
+        </div>
+
+        <div>
+          <h2>Tạo tài khoản mới</h2>
+          <p>Admin có thể tạo tài khoản Customer hoặc Admin.</p>
+        </div>
+      </div>
+
+      <form class="user-form" (ngSubmit)="createUser()">
+        <div class="role-select">
+          <label class="role-option" [class.active]="form.role === 'Customer'">
+            <input
+              type="radio"
+              name="role"
+              value="Customer"
+              [(ngModel)]="form.role"
+            />
+
+            <span class="material-symbols-outlined">person</span>
+
+            <div>
+              <strong>Customer</strong>
+              <p>Tài khoản mua hàng, đặt đơn và upload đơn thuốc.</p>
+            </div>
+          </label>
+
+          <label class="role-option" [class.active]="form.role === 'Admin'">
+            <input
+              type="radio"
+              name="role"
+              value="Admin"
+              [(ngModel)]="form.role"
+            />
+
+            <span class="material-symbols-outlined">admin_panel_settings</span>
+
+            <div>
+              <strong>Admin</strong>
+              <p>Tài khoản quản trị hệ thống nhà thuốc.</p>
+            </div>
+          </label>
+        </div>
+
+        @if (form.role === 'Admin') {
+          <div class="warning-box">
+            <span class="material-symbols-outlined">warning</span>
+            <p>
+              Tài khoản Admin có quyền quản lý sản phẩm, đơn hàng, đơn thuốc,
+              tồn kho, báo cáo và tạo thêm tài khoản khác.
+            </p>
+          </div>
+        }
+
+        <div class="form-group">
+          <label>Họ và tên</label>
+
+          <div class="input-wrapper">
+            <span class="material-symbols-outlined">badge</span>
+            <input
+              type="text"
+              name="fullName"
+              [(ngModel)]="form.fullName"
+              placeholder="Nguyễn Văn A"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+
+          <div class="input-wrapper">
+            <span class="material-symbols-outlined">mail</span>
+            <input
+              type="email"
+              name="email"
+              [(ngModel)]="form.email"
+              placeholder="user@example.com"
+            />
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Số điện thoại</label>
+
+            <div class="input-wrapper">
+              <span class="material-symbols-outlined">call</span>
+              <input
+                type="tel"
+                name="phoneNumber"
+                [(ngModel)]="form.phoneNumber"
+                placeholder="0901234567"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Địa chỉ</label>
+
+            <div class="input-wrapper">
+              <span class="material-symbols-outlined">location_on</span>
+              <input
+                type="text"
+                name="address"
+                [(ngModel)]="form.address"
+                placeholder="Địa chỉ"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Mật khẩu</label>
+
+            <div class="input-wrapper">
+              <span class="material-symbols-outlined">lock</span>
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                name="password"
+                [(ngModel)]="form.password"
+                placeholder="Tối thiểu 6 ký tự"
+              />
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePassword()"
+              >
+                <span class="material-symbols-outlined">
+                  {{ showPassword ? 'visibility_off' : 'visibility' }}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Xác nhận mật khẩu</label>
+
+            <div class="input-wrapper">
+              <span class="material-symbols-outlined">lock_reset</span>
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                name="confirmPassword"
+                [(ngModel)]="form.confirmPassword"
+                placeholder="Nhập lại mật khẩu"
+              />
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="toggleConfirmPassword()"
+              >
+                <span class="material-symbols-outlined">
+                  {{ showConfirmPassword ? 'visibility_off' : 'visibility' }}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button type="button" class="quick-button" (click)="fillCustomerDemo()">
+            Mật khẩu Customer mẫu
+          </button>
+
+          <button type="button" class="quick-button" (click)="fillAdminDemo()">
+            Mật khẩu Admin mẫu
+          </button>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="reset-button" (click)="resetForm()">
+            Làm mới
+          </button>
+
+          <button type="submit" class="submit-button" [disabled]="loading">
+            <span class="material-symbols-outlined">person_add</span>
+            {{ loading ? 'Đang tạo...' : 'Tạo tài khoản' }}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="list-card">
+      <div class="list-header">
+        <div>
+          <h2>Danh sách tài khoản</h2>
+          <p>{{ totalItems }} tài khoản</p>
+        </div>
+      </div>
+
+      <div class="toolbar-card">
+        <div class="search-box">
+          <span class="material-symbols-outlined">search</span>
+          <input
+            type="text"
+            name="keyword"
+            [(ngModel)]="query.keyword"
+            placeholder="Tìm tên, email, số điện thoại..."
+            (keyup.enter)="search()"
+          />
+        </div>
+
+        <select name="roleFilter" [(ngModel)]="query.role" (change)="filter()">
+          <option value="">Tất cả role</option>
+          <option value="Customer">Customer</option>
+          <option value="Admin">Admin</option>
+        </select>
+
+        <select name="activeFilter" [(ngModel)]="query.isActive" (change)="filter()">
+          <option [ngValue]="null">Tất cả trạng thái</option>
+          <option [ngValue]="true">Active</option>
+          <option [ngValue]="false">Locked</option>
+        </select>
+
+        <button type="button" class="search-button" (click)="search()">
+          Tìm kiếm
+        </button>
+      </div>
+
+      @if (listLoading) {
+        <div class="loading-box">
+          <span class="material-symbols-outlined">progress_activity</span>
+          Đang tải tài khoản...
+        </div>
+      } @else {
+        @if (users.length === 0) {
+          <div class="empty-state">
+            <span class="material-symbols-outlined">manage_accounts</span>
+            <h3>Không có tài khoản</h3>
+            <p>Thử thay đổi bộ lọc hoặc tạo tài khoản mới.</p>
+          </div>
+        } @else {
+          <div class="users-list">
+            @for (user of users; track user.id) {
+              <article class="user-card">
+                <div class="user-card-header">
+                  <div class="user-main">
+                    <div class="avatar">
+                      <span class="material-symbols-outlined">
+                        {{ user.role === 'Admin' ? 'admin_panel_settings' : 'person' }}
+                      </span>
+                    </div>
+
+                    <div class="user-title">
+                      <strong>{{ user.fullName }}</strong>
+                      <p>{{ user.email }}</p>
+                    </div>
+                  </div>
+
+                  <div class="user-badges">
+                    <span
+                      class="role-badge"
+                      [class.role-admin]="user.role === 'Admin'"
+                      [class.role-customer]="user.role === 'Customer'"
+                    >
+                      {{ user.role }}
+                    </span>
+
+                    <span
+                      class="status-badge"
+                      [class.status-active]="user.isActive !== false"
+                      [class.status-locked]="user.isActive === false"
+                    >
+                      {{ user.isActive === false ? 'Locked' : 'Active' }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="user-info-grid">
+                  <div class="user-info-item">
+                    <span>Số điện thoại</span>
+                    <strong>{{ user.phoneNumber || '-' }}</strong>
+                  </div>
+
+                  <div class="user-info-item">
+                    <span>Địa chỉ</span>
+                    <strong>{{ user.address || '-' }}</strong>
+                  </div>
+                </div>
+
+                <div class="user-card-actions">
+                  <button
+                    type="button"
+                    class="toggle-button"
+                    [class.unlock]="user.isActive === false"
+                    [disabled]="!canToggleUser(user)"
+                    (click)="toggleActive(user)"
+                  >
+                    @if (isCurrentUser(user)) {
+                      <span class="material-symbols-outlined">verified_user</span>
+                      Tài khoản hiện tại
+                    } @else if (user.isActive === false) {
+                      <span class="material-symbols-outlined">lock_open</span>
+                      Mở khóa
+                    } @else {
+                      <span class="material-symbols-outlined">lock</span>
+                      Khóa
+                    }
+                  </button>
+                </div>
+              </article>
+            }
+          </div>
+
+          @if (totalPages > 1) {
+            <div class="pagination">
+              <button
+                type="button"
+                [disabled]="query.page === 1"
+                (click)="goToPage(query.page - 1)"
+              >
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+
+              @for (page of pages; track page) {
+                <button
+                  type="button"
+                  [class.active]="page === query.page"
+                  (click)="goToPage(page)"
+                >
+                  {{ page }}
+                </button>
+              }
+
+              <button
+                type="button"
+                [disabled]="query.page === totalPages"
+                (click)="goToPage(query.page + 1)"
+              >
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+          }
+        }
+      }
+    </section>
+  </div>
+</div>

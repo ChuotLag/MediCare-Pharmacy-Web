@@ -1,0 +1,47 @@
+/* .auth-layout {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(156, 242, 232, 0.45), transparent 45%),
+    var(--color-surface);
+  z-index: 0;
+}
+
+.auth-main {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  padding: 16px;
+}
+
+.auth-footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-on-surface-variant);
+  font-size: 13px;
+}
+
+.auth-footer a {
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  color: var(--color-primary);
+} */
+
+:host {
+  display: block;
+  min-height: 100vh;
+}

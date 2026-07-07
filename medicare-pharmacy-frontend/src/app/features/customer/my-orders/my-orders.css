@@ -1,0 +1,586 @@
+.orders-page {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.orders-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.orders-header h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 800;
+}
+
+.orders-header p {
+  margin: 4px 0 0;
+  color: var(--color-on-surface-variant);
+}
+
+.continue-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.filter-card {
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-xl);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  grid-template-columns: 1fr 220px auto;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  position: relative;
+}
+
+.search-box .material-symbols-outlined {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: var(--color-on-surface-variant);
+  font-size: 20px;
+}
+
+.search-box input,
+.filter-card select {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  outline: none;
+}
+
+.search-box input {
+  padding: 0 14px 0 42px;
+}
+
+.filter-card select {
+  padding: 0 12px;
+}
+
+.search-box input:focus,
+.filter-card select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 92, 85, 0.15);
+}
+
+.filter-card button {
+  height: 44px;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--color-primary);
+  color: white;
+  padding: 0 18px;
+  font-weight: 800;
+}
+
+.alert {
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.alert-error {
+  background: var(--color-error-container);
+  color: var(--color-error);
+}
+
+.alert-success {
+  background: var(--color-secondary-container);
+  color: var(--color-secondary);
+}
+
+.loading-box,
+.empty-orders {
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-xl);
+  padding: 48px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.loading-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--color-on-surface-variant);
+}
+
+.loading-box .material-symbols-outlined {
+  animation: spin 1s linear infinite;
+}
+
+.empty-icon {
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 16px;
+  border-radius: var(--radius-full);
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon .material-symbols-outlined {
+  font-size: 44px;
+}
+
+.empty-orders h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.empty-orders p {
+  color: var(--color-on-surface-variant);
+  margin: 8px 0 24px;
+}
+
+.empty-orders .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.orders-card {
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.orders-card-title {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-outline-variant);
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.orders-card-title h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.orders-card-title span {
+  color: var(--color-on-surface-variant);
+  font-weight: 700;
+}
+
+.orders-table-wrapper {
+  overflow-x: auto;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(189, 201, 198, 0.45);
+  text-align: left;
+  font-size: 14px;
+}
+
+.orders-table th {
+  color: var(--color-on-surface-variant);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--color-surface-container-lowest);
+}
+
+.orders-table tbody tr:hover {
+  background: var(--color-surface-container-low);
+}
+
+.order-code {
+  color: var(--color-primary);
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.customer-info span {
+  color: var(--color-on-surface-variant);
+  font-size: 13px;
+}
+
+.amount {
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.status-badge,
+.payment-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background: var(--color-tertiary-fixed);
+  color: var(--color-tertiary);
+}
+
+.status-confirmed {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+}
+
+.status-preparing {
+  background: rgba(124, 58, 237, 0.12);
+  color: #7c3aed;
+}
+
+.status-shipping {
+  background: rgba(14, 116, 144, 0.12);
+  color: #0e7490;
+}
+
+.status-completed {
+  background: var(--color-secondary-container);
+  color: var(--color-secondary);
+}
+
+.status-cancelled {
+  background: var(--color-error-container);
+  color: var(--color-error);
+}
+
+.status-default {
+  background: var(--color-surface-container);
+  color: var(--color-on-surface-variant);
+}
+
+.payment-paid {
+  background: var(--color-secondary-container);
+  color: var(--color-secondary);
+}
+
+.payment-unpaid {
+  background: var(--color-tertiary-fixed);
+  color: var(--color-tertiary);
+}
+
+.payment-refunded {
+  background: var(--color-error-container);
+  color: var(--color-error);
+}
+
+.text-right {
+  text-align: right;
+}
+
+.actions-cell {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.view-button,
+.cancel-button {
+  min-height: 36px;
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+}
+
+.view-button {
+  border: 1px solid var(--color-primary);
+  background: white;
+  color: var(--color-primary);
+}
+
+.cancel-button {
+  border: none;
+  background: var(--color-error-container);
+  color: var(--color-error);
+}
+
+.view-button .material-symbols-outlined,
+.cancel-button .material-symbols-outlined {
+  font-size: 17px;
+}
+
+.pagination {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pagination button {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-outline-variant);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface-variant);
+  border-radius: var(--radius-lg);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination button.active {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(24, 28, 28, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.order-detail-modal {
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-outline-variant);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.modal-header p {
+  margin: 4px 0 0;
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.close-button {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container);
+  color: var(--color-on-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.detail-section {
+  border-top: 1px solid var(--color-outline-variant);
+  padding-top: 18px;
+  margin-top: 18px;
+}
+
+.detail-section h3 {
+  margin: 0 0 14px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.detail-grid div {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+}
+
+.detail-grid .full {
+  grid-column: span 2;
+}
+
+.detail-grid span {
+  display: block;
+  color: var(--color-on-surface-variant);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.detail-grid strong {
+  display: block;
+  line-height: 22px;
+}
+
+.detail-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-item {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.detail-item div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-item span {
+  color: var(--color-on-surface-variant);
+  font-size: 13px;
+}
+
+.detail-item-total {
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.modal-total {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--color-outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-total span {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.modal-total strong {
+  color: var(--color-primary);
+  font-size: 24px;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-cancel-button,
+.modal-close-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: var(--radius-lg);
+  font-weight: 800;
+}
+
+.modal-cancel-button {
+  border: none;
+  background: var(--color-error-container);
+  color: var(--color-error);
+}
+
+.modal-close-button {
+  border: none;
+  background: var(--color-primary);
+  color: white;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 800px) {
+  .orders-page {
+    padding: 20px 16px;
+  }
+
+  .orders-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-card {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid .full {
+    grid-column: auto;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+}

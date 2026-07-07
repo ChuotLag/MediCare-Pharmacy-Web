@@ -1,0 +1,269 @@
+<div class="dashboard-page">
+  <header class="dashboard-topbar">
+    <div>
+      <h1>Overview</h1>
+      <p>Welcome back, Admin</p>
+    </div>
+
+    <div class="topbar-actions">
+      <button type="button" class="icon-button">
+        <span class="material-symbols-outlined">notifications</span>
+      </button>
+
+      <div class="admin-pill">
+        <span class="material-symbols-outlined">person</span>
+        Admin
+      </div>
+    </div>
+  </header>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (loading && !summary) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải dashboard...
+    </div>
+  } @else {
+    <section class="stats-grid">
+      <article class="stat-card">
+        <div class="stat-icon icon-primary">
+          <span class="material-symbols-outlined">receipt_long</span>
+        </div>
+
+        <div>
+          <p>Tổng đơn hàng</p>
+          <strong>{{ summary?.totalOrders ?? 0 }}</strong>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon icon-secondary">
+          <span class="material-symbols-outlined">payments</span>
+        </div>
+
+        <div>
+          <p>Tổng doanh thu</p>
+          <strong>{{ summary?.totalRevenue ?? 0 | currency:'VND':'symbol':'1.0-0':'vi' }}</strong>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon icon-tertiary">
+          <span class="material-symbols-outlined">hourglass_top</span>
+        </div>
+
+        <div>
+          <p>Đơn chờ xử lý</p>
+          <strong>{{ summary?.pendingOrders ?? 0 }}</strong>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon icon-info">
+          <span class="material-symbols-outlined">done_all</span>
+        </div>
+
+        <div>
+          <p>Đơn hoàn thành</p>
+          <strong>{{ summary?.completedOrders ?? 0 }}</strong>
+        </div>
+      </article>
+    </section>
+
+    <section class="alerts-grid">
+      <article class="alert-card danger-alert">
+        <div class="alert-card-header">
+          <div>
+            <span class="material-symbols-outlined">warning</span>
+            <strong>Sản phẩm sắp hết hàng</strong>
+          </div>
+
+          <a routerLink="/admin/inventory">View All</a>
+        </div>
+
+        <div class="alert-number">
+          {{ summary?.lowStockItems ?? 0 }}
+          <span>items</span>
+        </div>
+      </article>
+
+      <article class="alert-card warning-alert">
+        <div class="alert-card-header">
+          <div>
+            <span class="material-symbols-outlined">event_busy</span>
+            <strong>Lô thuốc gần hết hạn</strong>
+          </div>
+
+          <a routerLink="/admin/inventory">View All</a>
+        </div>
+
+        <div class="alert-number">
+          {{ summary?.nearExpiryItems ?? 0 }}
+          <span>batches</span>
+        </div>
+      </article>
+
+      <article class="alert-card pending-alert">
+        <div class="alert-card-header">
+          <div>
+            <span class="material-symbols-outlined">clinical_notes</span>
+            <strong>Đơn thuốc chờ duyệt</strong>
+          </div>
+
+          <a routerLink="/admin/prescriptions">View All</a>
+        </div>
+
+        <div class="alert-number">
+          {{ summary?.totalPrescriptionsPending ?? 0 }}
+          <span>prescriptions</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="dashboard-main-grid">
+      <article class="revenue-card">
+        <div class="section-title-row">
+          <div>
+            <h2>Revenue Overview</h2>
+            <p>Last 30 days performance</p>
+          </div>
+
+          <button type="button" class="filter-button">
+            <span class="material-symbols-outlined">calendar_today</span>
+            This Month
+          </button>
+        </div>
+
+        @if (revenueData.length === 0) {
+          <div class="empty-chart">
+            <span class="material-symbols-outlined">bar_chart</span>
+            <p>Chưa có doanh thu từ đơn Completed</p>
+          </div>
+        } @else {
+          <div class="bar-chart">
+            @for (item of revenueData; track item.date) {
+              <div class="bar-item">
+                <div class="bar-track">
+                  <div
+                    class="bar-fill"
+                    [style.height.%]="getRevenueHeight(item.totalRevenue)"
+                  ></div>
+                </div>
+
+                <span>{{ item.date | date:'dd/MM' }}</span>
+              </div>
+            }
+          </div>
+        }
+      </article>
+
+      <article class="inventory-card">
+        <div class="section-title-row">
+          <div>
+            <h2>Inventory Alerts</h2>
+            <p>Products needing attention</p>
+          </div>
+
+          <a routerLink="/admin/inventory">Manage Stock</a>
+        </div>
+
+        <div class="inventory-list">
+          @if (lowStockItems.length === 0 && nearExpiryItems.length === 0) {
+            <div class="empty-small">
+              <span class="material-symbols-outlined">check_circle</span>
+              Không có cảnh báo tồn kho
+            </div>
+          }
+
+          @for (item of lowStockItems; track item.id) {
+            <div class="inventory-row">
+              <div>
+                <strong>{{ item.productName }}</strong>
+                <span>{{ item.batchNumber }}</span>
+              </div>
+
+              <span class="inventory-badge danger">
+                Stock: {{ item.quantity }}
+              </span>
+            </div>
+          }
+
+          @for (item of nearExpiryItems; track item.id) {
+            <div class="inventory-row">
+              <div>
+                <strong>{{ item.productName }}</strong>
+                <span>{{ item.batchNumber }}</span>
+              </div>
+
+              <span class="inventory-badge warning">
+                {{ item.daysToExpiry }} days
+              </span>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+
+    <section class="recent-orders-card">
+      <div class="section-title-row">
+        <div>
+          <h2>Recent Orders</h2>
+          <p>Latest customer orders</p>
+        </div>
+
+        <a routerLink="/admin/orders">View All</a>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="dashboard-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th>Amount</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (order of recentOrders; track order.id) {
+              <tr>
+                <td>
+                  <strong class="order-code">{{ order.orderCode }}</strong>
+                </td>
+
+                <td>{{ order.customerName }}</td>
+
+                <td>
+                  <span class="status-badge" [class]="getStatusClass(order.status)">
+                    {{ order.status }}
+                  </span>
+                </td>
+
+                <td>
+                  <strong class="amount">
+                    {{ order.totalAmount | currency:'VND':'symbol':'1.0-0':'vi' }}
+                  </strong>
+                </td>
+
+                <td>{{ order.createdAt | date:'dd/MM/yyyy' }}</td>
+              </tr>
+            }
+
+            @if (recentOrders.length === 0) {
+              <tr>
+                <td colspan="5" class="empty-table">
+                  Chưa có đơn hàng
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</div>

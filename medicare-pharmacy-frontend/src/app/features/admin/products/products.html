@@ -1,0 +1,397 @@
+<div class="admin-products-page">
+  <header class="page-header">
+    <div>
+      <h1>Quản lý sản phẩm</h1>
+      <p>Thêm, sửa, ẩn/hiện và quản lý thuốc trong hệ thống.</p>
+    </div>
+
+    <button type="button" class="add-button" (click)="openCreateForm()">
+      <span class="material-symbols-outlined">add</span>
+      Thêm sản phẩm
+    </button>
+  </header>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  <section class="toolbar-card">
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        name="keyword"
+        [(ngModel)]="query.keyword"
+        placeholder="Tìm theo tên, slug, nhà sản xuất..."
+        (keyup.enter)="search()"
+      />
+    </div>
+
+    <select
+      name="categoryId"
+      [(ngModel)]="query.categoryId"
+      (change)="filterCategory()"
+    >
+      <option value="">Tất cả danh mục</option>
+
+      @for (category of categories; track category.id) {
+        <option [value]="category.id">
+          {{ category.name }}
+        </option>
+      }
+    </select>
+
+    <select
+      name="sortBy"
+      [(ngModel)]="query.sortBy"
+      (change)="changeSort()"
+    >
+      <option value="newest">Mới nhất</option>
+      <option value="price_asc">Giá tăng dần</option>
+      <option value="price_desc">Giá giảm dần</option>
+      <option value="name_asc">Tên A-Z</option>
+      <option value="name_desc">Tên Z-A</option>
+    </select>
+
+    <button type="button" class="search-button" (click)="search()">
+      Tìm kiếm
+    </button>
+  </section>
+
+  @if (loading) {
+    <div class="loading-box">
+      <span class="material-symbols-outlined">progress_activity</span>
+      Đang tải sản phẩm...
+    </div>
+  } @else {
+    <section class="table-card">
+      <div class="table-card-title">
+        <div>
+          <h2>Danh sách sản phẩm</h2>
+          <p>{{ totalItems }} sản phẩm</p>
+        </div>
+      </div>
+
+      @if (products.length === 0) {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">medication</span>
+          <h3>Không có sản phẩm</h3>
+          <p>Hãy thêm sản phẩm đầu tiên cho nhà thuốc.</p>
+        </div>
+      } @else {
+        <div class="table-wrapper">
+          <table class="products-table">
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th>Danh mục</th>
+                <th>Giá</th>
+                <th>Tồn kho</th>
+                <th>Cần đơn</th>
+                <th>Trạng thái</th>
+                <th class="text-right">Hành động</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (product of products; track product.id) {
+                <tr>
+                  <td>
+                    <div class="product-name-cell">
+                      <div class="product-image">
+                        @if (product.imageUrl) {
+                          <img [src]="product.imageUrl" [alt]="product.name" />
+                        } @else {
+                          <span class="material-symbols-outlined">medication</span>
+                        }
+                      </div>
+
+                      <div>
+                        <strong>{{ product.name }}</strong>
+                        <span>{{ product.manufacturer || 'Chưa có NSX' }}</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td>
+                    {{ product.categoryName }}
+                  </td>
+
+                  <td>
+                    <strong class="price">
+                      {{ product.price | currency:'VND':'symbol':'1.0-0':'vi' }}
+                    </strong>
+                    <span class="unit">/ {{ product.unit }}</span>
+                  </td>
+
+                  <td>
+                    <span class="stock-badge" [class]="getStockClass(product)">
+                      {{ getStockText(product) }}
+                    </span>
+                  </td>
+
+                  <td>
+                    @if (product.requiresPrescription) {
+                      <span class="rx-badge rx-yes">
+                        <span class="material-symbols-outlined">warning</span>
+                        Có
+                      </span>
+                    } @else {
+                      <span class="rx-badge rx-no">Không</span>
+                    }
+                  </td>
+
+                  <td>
+                    @if (product.isActive) {
+                      <span class="status-badge status-active">Active</span>
+                    } @else {
+                      <span class="status-badge status-inactive">Inactive</span>
+                    }
+                  </td>
+
+                  <td class="actions-cell">
+                    <button type="button" class="edit-button" (click)="openEditForm(product)">
+                      <span class="material-symbols-outlined">edit</span>
+                      Sửa
+                    </button>
+
+                    <button type="button" class="toggle-button" (click)="toggleActive(product)">
+                      @if (product.isActive) {
+                        <span class="material-symbols-outlined">visibility_off</span>
+                        Ẩn
+                      } @else {
+                        <span class="material-symbols-outlined">visibility</span>
+                        Hiện
+                      }
+                    </button>
+
+                    <button type="button" class="delete-button" (click)="deleteProduct(product)">
+                      <span class="material-symbols-outlined">delete</span>
+                      Xóa
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <button
+              type="button"
+              [disabled]="query.page === 1"
+              (click)="goToPage(query.page - 1)"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+
+            @for (page of pages; track page) {
+              <button
+                type="button"
+                [class.active]="page === query.page"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+
+            <button
+              type="button"
+              [disabled]="query.page === totalPages"
+              (click)="goToPage(query.page + 1)"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        }
+      }
+    </section>
+  }
+
+  @if (showForm) {
+    <div class="modal-backdrop" (click)="closeForm()">
+      <div class="form-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>{{ editingProduct ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm' }}</h2>
+            <p>
+              {{ editingProduct ? 'Chỉnh sửa thông tin thuốc.' : 'Tạo sản phẩm thuốc mới.' }}
+            </p>
+          </div>
+
+          <button type="button" class="close-button" (click)="closeForm()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <form class="product-form" (ngSubmit)="save()">
+          <div class="form-section">
+            <h3>Thông tin cơ bản</h3>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Danh mục</label>
+                <select
+                  name="categoryId"
+                  [(ngModel)]="form.categoryId"
+                  required
+                >
+                  <option value="">Chọn danh mục</option>
+
+                  @for (category of categories; track category.id) {
+                    <option [value]="category.id">
+                      {{ category.name }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Tên sản phẩm</label>
+                <input
+                  type="text"
+                  name="name"
+                  [(ngModel)]="form.name"
+                  placeholder="Paracetamol 500mg"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Đơn vị</label>
+                <input
+                  type="text"
+                  name="unit"
+                  [(ngModel)]="form.unit"
+                  placeholder="Hộp, vỉ, chai..."
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Giá bán</label>
+                <input
+                  type="number"
+                  name="price"
+                  [(ngModel)]="form.price"
+                  min="1"
+                  placeholder="25000"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Nhà sản xuất</label>
+                <input
+                  type="text"
+                  name="manufacturer"
+                  [(ngModel)]="form.manufacturer"
+                  placeholder="MediCare Pharma"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Xuất xứ</label>
+                <input
+                  type="text"
+                  name="origin"
+                  [(ngModel)]="form.origin"
+                  placeholder="Việt Nam"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Thông tin y dược</h3>
+
+            <div class="form-group">
+              <label>Mô tả</label>
+              <textarea
+                name="description"
+                [(ngModel)]="form.description"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Thành phần</label>
+              <textarea
+                name="ingredients"
+                [(ngModel)]="form.ingredients"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Hướng dẫn sử dụng</label>
+              <textarea
+                name="usageInstructions"
+                [(ngModel)]="form.usageInstructions"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Chống chỉ định</label>
+              <textarea
+                name="contraindications"
+                [(ngModel)]="form.contraindications"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Thiết lập</h3>
+
+            <div class="form-group">
+              <label>Image URL</label>
+              <input
+                type="text"
+                name="imageUrl"
+                [(ngModel)]="form.imageUrl"
+                placeholder="Có thể để trống"
+              />
+            </div>
+
+            <label class="switch-row">
+              <input
+                type="checkbox"
+                name="requiresPrescription"
+                [(ngModel)]="form.requiresPrescription"
+              />
+              <span>Sản phẩm cần đơn thuốc</span>
+            </label>
+
+            @if (editingProduct) {
+              <label class="switch-row">
+                <input
+                  type="checkbox"
+                  name="isActive"
+                  [(ngModel)]="form.isActive"
+                />
+                <span>Đang hoạt động</span>
+              </label>
+            }
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-modal-button" (click)="closeForm()">
+              Hủy
+            </button>
+
+            <button type="submit" class="save-button" [disabled]="saving">
+              {{ saving ? 'Đang lưu...' : 'Lưu sản phẩm' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>
