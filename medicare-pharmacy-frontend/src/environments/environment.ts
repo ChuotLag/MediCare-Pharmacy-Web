@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiUrl: 'https://localhost:7073/api'
+  production: true,
+  apiUrl: 'https://medicare-pharmacy-api.onrender.com/api'
 };
