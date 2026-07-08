@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 COPY . .
-RUN dotnet restore "MediCarePharmacy.sln"
+RUN dotnet restore "MediCarePharmacy.slnx"
 RUN dotnet publish "MediCarePharmacy.API/MediCarePharmacy.API.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
