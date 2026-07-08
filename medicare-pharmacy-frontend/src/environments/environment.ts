@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://medicare-pharmacy-api.onrender.com/api'
+  apiUrl: 'https://chuotlag-001-site1.etempurl.com/api'
 };
